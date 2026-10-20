@@ -12,7 +12,7 @@
 
     <!-- The whole launcher is drawn on a fixed 1280x800 canvas (the Steam Deck screen) and scaled to the window, so it looks the same everywhere. -->
     <Viewbox Stretch="Uniform">
-        <Grid Width="1280" Height="800" RowDefinitions="96 * 72" x:Name="MainGrid" KeyboardNavigation.TabNavigation="Cycle">
+        <Grid Width="1280" Height="800" RowDefinitions="96 * 84" x:Name="MainGrid" KeyboardNavigation.TabNavigation="Cycle">
 
             <Grid.Background>
                 <ImageBrush Source="/Assets/Images/background.png" Stretch="UniformToFill" />
@@ -188,8 +188,8 @@
                     <TextBlock VerticalAlignment="Center" FontSize="17" Foreground="#9FB2C6" Text="Back" />
                 </StackPanel>
 
-                <Button Grid.Column="2" Margin="0 0 12 0" Width="200" x:Name="UpdatesButton" Click="UpdatesButton_Click">Updates</Button>
-                <Button Grid.Column="3" Margin="0 0 40 0" Width="200" x:Name="OptionsButton" Click="OptionsButton_Click">Options</Button>
+                <Button Grid.Column="2" Margin="0 0 12 0" Width="200" VerticalAlignment="Center" x:Name="UpdatesButton" Click="UpdatesButton_Click">Updates</Button>
+                <Button Grid.Column="3" Margin="0 0 40 0" Width="200" VerticalAlignment="Center" x:Name="OptionsButton" Click="OptionsButton_Click">Options</Button>
             </Grid>
 
         </Grid>
