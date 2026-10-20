@@ -127,7 +127,9 @@ namespace OmegaLauncher.Core.ClientManagement
             }
 
             runners.AddRange(DetectRunners());
-            return runners;
+
+            // The player's choice is usually one of the detected ones: list each program once, keeping the first (best) position.
+            return runners.DistinctBy(runner => runner.Path).ToList();
         }
 
         private void AddContentToken(List<string> args)
