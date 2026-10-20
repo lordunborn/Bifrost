@@ -100,7 +100,18 @@ namespace OmegaLauncher.Core.ClientManagement
         /// <summary>Why the last <see cref="Launch"/> or <see cref="BuildLaunchCommand"/> failed, in words for the player.</summary>
         public string LastLaunchError { get; private set; } = string.Empty;
 
-        /// <summary>The runners this machine offers for the Windows game (Linux only), best first.</summary>
+        /// <summary>Everything this machine offers for running the Windows game (Linux only), best first, ignoring the player's choice.</summary>
+        public List<GameRunner> DetectRunners()
+        {
+            if (OperatingSystem.IsLinux() == false)
+                return new();
+
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string[] pathDirectories = (Environment.GetEnvironmentVariable("PATH") ?? string.Empty).Split(Path.PathSeparator);
+            return LinuxRunner.Detect(home, pathDirectories);
+        }
+
+        /// <summary>The runners to try, best first: the player's choice (environment variable or setting) and then everything detected.</summary>
         public List<GameRunner> FindRunners()
         {
             List<GameRunner> runners = new();
@@ -115,9 +126,7 @@ namespace OmegaLauncher.Core.ClientManagement
                     runners.Add(chosen);
             }
 
-            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string[] pathDirectories = (Environment.GetEnvironmentVariable("PATH") ?? string.Empty).Split(Path.PathSeparator);
-            runners.AddRange(LinuxRunner.Detect(home, pathDirectories));
+            runners.AddRange(DetectRunners());
             return runners;
         }
 
@@ -144,7 +153,14 @@ namespace OmegaLauncher.Core.ClientManagement
                 return null;
             }
 
-            string[] args = LaunchConfig.ToLaunchArguments(serverInfo, _clientDirectory.ClientMetadata.Flags);
+            List<string> args = [.. LaunchConfig.ToLaunchArguments(serverInfo, _clientDirectory.ClientMetadata.Flags)];
+
+            // On a Steam Deck the game starts at the Deck's screen size, unless the player picked a resolution or switched this off.
+            if (GuiConfig.DeckResolution && SteamDeck.IsSteamDeck() && LaunchConfig.ForceCustomResolution == false &&
+                args.Any(arg => arg.StartsWith("-ResX", StringComparison.OrdinalIgnoreCase)) == false)
+            {
+                SteamDeck.AddResolutionArguments(args);
+            }
 
             if (OperatingSystem.IsLinux() == false)
                 return new LaunchCommand { FileName = executablePath, Arguments = [.. args] };

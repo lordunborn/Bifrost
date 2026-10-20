@@ -5,6 +5,23 @@
              mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="495"
              x:Class="OmegaLauncher.Avalonia.Views.Options.OptionsLauncherUserControl">
     <StackPanel>
+        <!-- Linux and Steam Deck only: how the Windows game is run. Hidden on Windows. -->
+        <HeaderedContentControl Header="Run the game with" x:Name="RunnerSection" IsVisible="False">
+            <Grid ColumnDefinitions="auto * auto" RowDefinitions="auto auto auto auto" ColumnSpacing="10" RowSpacing="10">
+                <Label Grid.Column="0" Grid.Row="0" Content="Runner" />
+                <ComboBox Grid.Column="1" Grid.Row="0" x:Name="RunnerComboBox" HorizontalAlignment="Stretch" />
+                <Button Grid.Column="2" Grid.Row="0" x:Name="RefreshRunnersButton" Click="RefreshRunnersButton_Click" MinHeight="44" Padding="16 0">Refresh</Button>
+
+                <TextBlock Grid.Column="1" Grid.Row="1" Classes="muted" FontSize="15" TextWrapping="Wrap" x:Name="RunnerHintTextBlock" />
+                <Button Grid.Column="2" Grid.Row="1" x:Name="BrowseRunnerButton" Click="BrowseRunnerButton_Click" MinHeight="44" Padding="16 0" VerticalAlignment="Top">Browse...</Button>
+
+                <Label Grid.Column="0" Grid.Row="2" Content="Wine prefix" />
+                <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2" x:Name="PrefixTextBox" />
+
+                <CheckBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" x:Name="DeckResolutionCheckBox" Content="On a Steam Deck, start the game at 1280 x 800" />
+            </Grid>
+        </HeaderedContentControl>
+
         <HeaderedContentControl Header="Theme">
             <Grid Grid.ColumnDefinitions="auto *" RowDefinitions="auto">
                 <Label Grid.Column="0" Grid.Row="0" Content="Selected Theme" />

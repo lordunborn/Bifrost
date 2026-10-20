@@ -523,6 +523,8 @@ namespace OmegaLauncher.Avalonia.Views
             if (_clientLauncher.GuiConfig.ThemeOverride != oldConfig.ThemeOverride)
                 ApplyTheme(_clientLauncher.GuiConfig.ThemeOverride);
 
+            RefreshRunner();
+
             if (_clientLauncher.GuiConfig.NewsCategoryFilter != oldConfig.NewsCategoryFilter ||
                 _clientLauncher.GuiConfig.DefaultNewsFeedUrl != oldConfig.DefaultNewsFeedUrl)
             {

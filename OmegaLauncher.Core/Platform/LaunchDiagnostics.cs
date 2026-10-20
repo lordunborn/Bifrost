@@ -1,4 +1,4 @@
-using OmegaLauncher.Core.ClientManagement;
+﻿using OmegaLauncher.Core.ClientManagement;
 
 namespace OmegaLauncher.Core.Platform
 {
@@ -30,6 +30,9 @@ namespace OmegaLauncher.Core.Platform
 
             if (result != ClientLauncherInitializationResult.Success)
                 return 1;
+
+            if (OperatingSystem.IsLinux() || SteamDeck.IsForced)
+                output.WriteLine($"Steam Deck: {(SteamDeck.IsSteamDeck() ? "yes" : "no")}");
 
             if (OperatingSystem.IsLinux())
             {
