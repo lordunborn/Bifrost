@@ -5,7 +5,7 @@ Omega Launcher is the player launcher and client updater for a Marvel Heroes Ome
 It is based on [Bifrost](https://github.com/Crypto137/Bifrost) by Crypto137 (MIT license). The launcher window, the update system and the Linux / Steam Deck support are new; the
 client launching, server list and news feed come from Bifrost. See `LICENSE` for the original license.
 
-<img src="./Screenshot.png" title="" alt="Screenshot" data-align="center">
+<img src="./docs/images/omega-launcher.png" title="" alt="Omega Launcher main window" data-align="center">
 
 ## Features
 
