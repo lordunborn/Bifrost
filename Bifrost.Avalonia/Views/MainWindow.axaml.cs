@@ -316,7 +316,7 @@ namespace Bifrost.Avalonia.Views
             }
             else
             {
-                await MessageBoxWindow.Show(this, "Failed to launch game client.", "Error");
+                await MessageBoxWindow.Show(this, string.IsNullOrEmpty(_clientLauncher.LastLaunchError) ? "Failed to launch game client." : _clientLauncher.LastLaunchError, "Error");
                 SetControlsEnabled(true);
                 PlayButton.IsEnabled = true;
             }

@@ -14,6 +14,12 @@ namespace Bifrost.Avalonia
         [STAThread]
         public static void Main(string[] args)
         {
+            if (Array.Exists(args, arg => string.Equals(arg, "--print-launch", StringComparison.OrdinalIgnoreCase)))
+            {
+                Environment.ExitCode = Bifrost.Core.Platform.LaunchDiagnostics.Run(Console.Out);
+                return;
+            }
+
             AutoPlay = Array.Exists(args, arg => string.Equals(arg, "--autoplay", StringComparison.OrdinalIgnoreCase));
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }

@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bifrost.Updates\Bifrost.Updates.csproj" />
+    <ProjectReference Include="..\Bifrost.Core\Bifrost.Core.csproj" />
   </ItemGroup>
 
 </Project>
