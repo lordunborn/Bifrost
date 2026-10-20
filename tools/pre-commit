@@ -1,0 +1,37 @@
+#!/bin/sh
+# MHOLauncher pre-commit guard: block commits that would publish a server address, a saved login or a private key.
+# Installed by tools/install-hooks.sh. Extra patterns (regular expressions, one per line) can go in .git/info/mho-private-patterns.
+
+patterns_file="$(git rev-parse --git-dir)/info/mho-private-patterns"
+added=$(git diff --cached --no-color -U0 --diff-filter=ACM | grep '^+' | grep -v '^+++')
+status=0
+
+report() {
+  echo "pre-commit: refusing to commit ($1):"
+  printf '%s\n' "$2" | sed 's/^/    /'
+  status=1
+}
+
+hits=$(printf '%s\n' "$added" | grep -E -n 'BEGIN [A-Z ]*PRIVATE KEY' | head -5)
+[ -n "$hits" ] && report "private key" "$hits"
+
+hits=$(printf '%s\n' "$added" | grep -E -n '"AutoLogin(Email|Password)[A-Za-z]*"[[:space:]]*:[[:space:]]*"[^"]+"' | head -5)
+[ -n "$hits" ] && report "saved login in a launch config" "$hits"
+
+# Public IPv4 address: anything except loopback, 0.0.0.0, private ranges and documentation ranges. Lines that mention a version are skipped
+# (AssemblyVersion 0.1.0.0, client version 1.53.0.203 and so on look like addresses); 0.x.x.x and 1.4x/1.5x.x.x are treated as versions.
+ipv4='(^|[^0-9.])((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])([^0-9.]|$)'
+allowed='(^|[^0-9.])(127\.0\.0\.1|0\.[0-9]+\.[0-9]+\.[0-9]+|1\.(4[0-9]|5[0-9])\.[0-9]+\.[0-9]+|255\.255\.255\.[0-9]+|10\.[0-9]+\.[0-9]+\.[0-9]+|192\.168\.[0-9]+\.[0-9]+|172\.(1[6-9]|2[0-9]|3[01])\.[0-9]+\.[0-9]+|192\.0\.2\.[0-9]+|198\.51\.100\.[0-9]+|203\.0\.113\.[0-9]+)([^0-9.]|$)'
+hits=$(printf '%s\n' "$added" | grep -v -i 'version' | grep -E -n "$ipv4" | grep -v -E "$allowed" | head -5)
+[ -n "$hits" ] && report "public IPv4 address" "$hits"
+
+if [ -f "$patterns_file" ]; then
+  while IFS= read -r pattern; do
+    [ -z "$pattern" ] && continue
+    hits=$(printf '%s\n' "$added" | grep -E -n -- "$pattern" | head -5)
+    [ -n "$hits" ] && report "matches a private pattern" "$hits"
+  done < "$patterns_file"
+fi
+
+[ $status -ne 0 ] && echo "pre-commit: nothing was committed. Remove the lines above (use the templates/ files for examples)."
+exit $status
