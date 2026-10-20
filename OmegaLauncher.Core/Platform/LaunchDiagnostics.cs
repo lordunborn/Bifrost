@@ -50,7 +50,8 @@ namespace OmegaLauncher.Core.Platform
             }
 
             output.WriteLine("Command:");
-            output.WriteLine(command.Describe());
+            // The signature is not printed: this output gets pasted into bug reports.
+            output.WriteLine(System.Text.RegularExpressions.Regex.Replace(command.Describe(), @"(-webtoken=mho1\.\d+\.)[0-9a-fA-F]+", "$1<hidden>"));
             return 0;
         }
     }

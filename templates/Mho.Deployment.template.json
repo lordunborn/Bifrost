@@ -2,5 +2,6 @@
   "_comment": "Copy to Mho.Deployment.json next to the launcher and fill in. NEVER commit the filled-in file: it holds your server address.",
   "UpdateBaseUrl": "",
   "UpdatePublicKey": "",
+  "ContentTokenSecret": "",
   "Servers": []
 }

@@ -130,6 +130,19 @@ namespace OmegaLauncher.Core.ClientManagement
             return runners;
         }
 
+        private void AddContentToken(List<string> args)
+        {
+            string secret = Deployment?.ContentTokenSecret;
+            if (string.IsNullOrWhiteSpace(secret) || string.IsNullOrEmpty(ClientRoot))
+                return;
+
+            if (args.Any(arg => arg.StartsWith("-webtoken", StringComparison.OrdinalIgnoreCase)))
+                return;
+
+            int installedVersion = OmegaLauncher.Updates.Client.LauncherStateStore.Load(new OmegaLauncher.Updates.Client.MhoFolders(ClientRoot)).ContentVersion;
+            args.Add("-webtoken=" + ContentToken.Create(installedVersion, secret));
+        }
+
         public LaunchCommand BuildLaunchCommand()
         {
             LastLaunchError = string.Empty;
@@ -154,6 +167,9 @@ namespace OmegaLauncher.Core.ClientManagement
             }
 
             List<string> args = [.. LaunchConfig.ToLaunchArguments(serverInfo, _clientDirectory.ClientMetadata.Flags)];
+
+            // Tell the server which version of the launcher-managed files this client has (it can refuse clients that are out of date).
+            AddContentToken(args);
 
             // On a Steam Deck the game starts at the Deck's screen size, unless the player picked a resolution or switched this off.
             if (GuiConfig.DeckResolution && SteamDeck.IsSteamDeck() && LaunchConfig.ForceCustomResolution == false &&
