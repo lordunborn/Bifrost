@@ -40,6 +40,7 @@ On a Steam Deck the game starts at 1280 x 800 automatically. You can turn that o
 | The game says it needs a patch when you log in | Your client files are older than the server needs. Press **Update** in the launcher, then Play from the launcher (starting the game any other way skips the check the server makes). |
 | Not enough disk space | Free some space and try again. Nothing is left half-installed. |
 | You want the original game back | **Updates → Restore original files** puts back every file the launcher replaced and removes the ones it added. |
+| (Linux) The launcher closes at once and the message mentions `libICE`, `libSM` or another `.so` file | A desktop Linux or SteamOS already has these. On a minimal install add them, for example on Ubuntu or Debian: `sudo apt install libice6 libsm6 libx11-6 libxcursor1 libxrandr2 libxi6 libfontconfig1 libfreetype6 libxkbcommon-x11-0 libegl1`. |
 | (Linux) "Nothing found" under Runs with | Install GE-Proton with ProtonUp-Qt, press **Refresh** in **Options → Launcher**, or use **Browse** to pick a `proton`, `umu-run` or `wine` file. |
 
 ## Asking for help

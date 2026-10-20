@@ -58,8 +58,27 @@ namespace OmegaLauncher.Updates.Tests
         }
 
         [Fact]
+        public void Install_NewProgramIsExecutableOnLinux()
+        {
+            if (OperatingSystem.IsWindows())
+                return;
+
+            string current = Write("OmegaLauncher", "old program");
+            string downloaded = Write("OmegaLauncher.new", "new program");   // a freshly downloaded file has no executable bit
+
+            SelfUpdate.Install(current, downloaded);
+
+            Assert.True(File.GetUnixFileMode(current).HasFlag(UnixFileMode.UserExecute));
+        }
+
+        [Fact]
         public void Install_NewFileCannotBeMoved_PutsTheOldProgramBack()
         {
+            // Needs a file that cannot be moved. Windows refuses to move an open file; Linux allows it, so the case cannot be set up there
+            // (the rollback code is the same on both).
+            if (OperatingSystem.IsWindows() == false)
+                return;
+
             string current = Write("OmegaLauncher.exe", "old program");
             string downloaded = Write("OmegaLauncher.exe.new", "new program");
 
