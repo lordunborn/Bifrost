@@ -6,14 +6,14 @@ What is kept out of git (see `.gitignore`):
 
 | File | Holds | In the repo |
 | --- | --- | --- |
-| `Bifrost.LaunchConfig.json` | auto-login email and password, launch options | `templates/Bifrost.LaunchConfig.template.json` (empty login) |
-| `Bifrost.ServerList.json` | server names and SiteConfig addresses | `templates/Bifrost.ServerList.template.json` (`[]`) |
+| `OmegaLauncher.LaunchConfig.json` | auto-login email and password, launch options | `templates/OmegaLauncher.LaunchConfig.template.json` (empty login) |
+| `OmegaLauncher.ServerList.json` | server names and SiteConfig addresses | `templates/OmegaLauncher.ServerList.template.json` (`[]`) |
 | `Mho.Deployment.json` | update host address, update public key, default server entries | `templates/Mho.Deployment.template.json` (empty) |
 | `mho-private.pem` | the key that signs updates | never |
 | `baseline.json`, `hashes.json`, `host/` | publisher working files | never |
 
 How a release gets our server in it: the release build copies the real `Mho.Deployment.json` (and a filled-in server list) into the release zip from a
-folder outside this repository. A launcher built from source without those files works like plain Bifrost: no server, no updater.
+folder outside this repository. A launcher built from source without those files works like a plain launcher: no server, no updater.
 
 ## Local guard
 

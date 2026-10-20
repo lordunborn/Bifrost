@@ -366,6 +366,9 @@ FodyWeavers.xsd
 Bifrost.LaunchConfig.json
 Bifrost.ServerList.json
 Bifrost.GuiConfig.json
+OmegaLauncher.LaunchConfig.json
+OmegaLauncher.ServerList.json
+OmegaLauncher.GuiConfig.json
 Mho.Deployment.json
 launcher-state.json
 # Publisher secrets and output

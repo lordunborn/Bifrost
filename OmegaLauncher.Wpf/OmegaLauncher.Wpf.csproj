@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWPF>true</UseWPF>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Background.png" />
+    <None Remove="Resources\BebasNeue-Regular.ttf" />
+    <None Remove="Resources\Button.png" />
+    <None Remove="Resources\ButtonHover.png" />
+    <None Remove="Resources\ButtonSmall.png" />
+    <None Remove="Resources\ButtonSmallHover.png" />
+    <None Remove="Resources\ThirdPartyLicenses.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="icon.ico" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Caliburn.Micro" Version="4.0.212" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OmegaLauncher.Core\OmegaLauncher.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Background.png" />
+    <Resource Include="Resources\ThirdPartyLicenses.txt" />
+    <Resource Include="Resources\BebasNeue-Regular.ttf" />
+    <Resource Include="Resources\Button.png" />
+    <Resource Include="Resources\ButtonHover.png" />
+    <Resource Include="Resources\ButtonSmall.png" />
+    <Resource Include="Resources\ButtonSmallHover.png" />
+  </ItemGroup>
+
+</Project>

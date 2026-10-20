@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="495"
+             x:Class="OmegaLauncher.Avalonia.Views.Options.OptionsAdvancedUserControl">
+
+    <StackPanel>
+        <HeaderedContentControl Header="Modes">
+            <Grid ColumnDefinitions="auto *" RowDefinitions="auto auto *">
+                <CheckBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Content="Force 32-bit" x:Name="Force32BitCheckBox" />
+
+                <Label Grid.Column="0" Grid.Row="1" Content="Downloader" />
+                <ComboBox Grid.Column="1" Grid.Row="1" x:Name="DownloadersComboBox" />
+            </Grid>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Header="Features">
+            <StackPanel>
+                <CheckBox Content="Disable Sound" x:Name="NoSoundCheckBox" />
+                <CheckBox Content="Disable Login Screen Account" x:Name="NoAccountCheckBox" />
+                <CheckBox Content="Disable Options" x:Name="NoOptionsCheckBox" />
+                <CheckBox Content="Disable Store" x:Name="NoStoreCheckBox" />
+                <CheckBox Content="Disable Store Catalog" x:Name="NoCatalogCheckBox" />
+                <CheckBox Content="Disable News" x:Name="NoNewsCheckBox" />
+                <CheckBox Content="Disable Logout" x:Name="NoLogoutCheckBox" />
+            </StackPanel>
+        </HeaderedContentControl>
+    </StackPanel>
+</UserControl>

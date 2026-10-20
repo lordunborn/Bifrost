@@ -1,0 +1,80 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="using:OmegaLauncher.Avalonia.Views.Options"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
+        x:Class="OmegaLauncher.Avalonia.Views.Options.OptionsWindow"
+        Title="Options" Width="1000" Height="700"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False" CanMinimize="False" >
+
+    <Grid RowDefinitions="* auto">
+        <Grid Grid.Row="0" ColumnDefinitions="260 *" Margin="24 24 24 0" ColumnSpacing="20">
+            <ListBox x:Name="CategoryListBox" SelectionChanged="CategoryListBox_SelectionChanged" SelectionMode="Single, AlwaysSelected">
+                <ListBox.Styles>
+                    <Style Selector="StackPanel">
+                        <Setter Property="Orientation" Value="Horizontal" />
+                        <Setter Property="Spacing" Value="10" />
+                        <Setter Property="Margin" Value="4 0 0 0" />
+                    </Style>
+                    <Style Selector="Image">
+                        <Setter Property="Width" Value="28" />
+                        <Setter Property="Height" Value="28" />
+                    </Style>
+                    <Style Selector="Label">
+                        <Setter Property="FontSize" Value="20" />
+                    </Style>
+                </ListBox.Styles>
+                
+                <ListBoxItem>
+                    <StackPanel>
+                        <Image Source="/Assets/Icons/general.png"/>
+                        <Label Content="General"/>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem>
+                    <StackPanel>
+                        <Image Source="/Assets/Icons/launcher.png"/>
+                        <Label Content="Launcher"/>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem>
+                    <StackPanel>
+                        <Image Source="/Assets/Icons/logging.png"/>
+                        <Label Content="Logging"/>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem>
+                    <StackPanel>
+                        <Image Source="/Assets/Icons/advanced.png"/>
+                        <Label Content="Advanced"/>
+                    </StackPanel>
+                </ListBoxItem>
+                <ListBoxItem>
+                    <StackPanel>
+                        <Image Source="/Assets/Icons/about.png"/>
+                        <Label Content="About"/>
+                    </StackPanel>
+                </ListBoxItem>
+            </ListBox>
+
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <Panel Margin="0 0 14 0">
+                <local:OptionsGeneralUserControl x:Name="GeneralUserControl" IsVisible="False" />
+                <local:OptionsLauncherUserControl x:Name="LauncherUserControl" IsVisible="False" />
+                <local:OptionsLoggingUserControl x:Name="LoggingUserControl" IsVisible="False" />
+                <local:OptionsAdvancedUserControl x:Name="AdvancedUserControl" IsVisible="False" />
+                <local:OptionsAboutUserControl x:Name="AboutUserControl" IsVisible="False" />
+            </Panel>
+            </ScrollViewer>
+
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="* 180 14 180" Margin="24 18 24 24">
+            <Button Grid.Column="1" Classes="primary" IsDefault="True" Content="Apply" x:Name="ApplyButton" Click="ApplyButton_Click" HorizontalAlignment="Stretch" />	
+            <Button Grid.Column="3" IsCancel="True" Content="Cancel" x:Name="CancelButton" Click="CancelButton_Click" HorizontalAlignment="Stretch" />	
+        </Grid>
+    </Grid>
+
+</Window>

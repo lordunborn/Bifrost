@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="620" d:DesignHeight="260"
+        x:Class="OmegaLauncher.Avalonia.Views.Dialogs.MessageBoxWindow"
+        Title="Title"
+        Width="620" Height="260" CanResize="False" CanMinimize="False"
+        WindowStartupLocation="CenterOwner">
+
+  <Grid RowDefinitions="* Auto" ColumnDefinitions="* 14 *" Margin="32 28 32 28" RowSpacing="20">
+      <TextBlock x:Name="MessageTextBlock" Grid.Row="0" Grid.ColumnSpan="3" FontSize="22" VerticalAlignment="Center" TextWrapping="Wrap">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</TextBlock>
+      <Button x:Name="OKButton" Classes="primary" Click="OKButton_Click" IsDefault="True" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch">OK</Button>
+      <Button x:Name="CancelButton" Click="CancelButton_Click" IsCancel="True" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch">Cancel</Button>
+  </Grid>
+
+</Window>

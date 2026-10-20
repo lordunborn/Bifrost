@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="420"
+        x:Class="OmegaLauncher.Avalonia.Views.EditServerWindow"
+        Title="Edit Server"
+        Width="760" Height="420" CanMinimize="False" CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid RowDefinitions="Auto Auto * Auto" Margin="32 24 32 28" RowSpacing="18">
+        <TextBlock Grid.Row="0" Classes="heading" FontSize="44" Text="Edit server" />
+
+        <Grid Grid.Row="1" ColumnDefinitions="200 *" RowDefinitions="Auto Auto Auto" ColumnSpacing="12" RowSpacing="12">
+            <Label Grid.Column="0" Grid.Row="0" Content="Server name" />
+            <TextBox Grid.Column="1" Grid.Row="0" x:Name="NameTextBox" />
+
+            <Label Grid.Column="0" Grid.Row="1" Content="Site Config URL" />
+            <TextBox Grid.Column="1" Grid.Row="1" x:Name="SiteConfigUrlTextBox" />
+
+            <Label Grid.Column="0" Grid.Row="2" Content="News feed URL" />
+            <TextBox Grid.Column="1" Grid.Row="2" x:Name="NewsFeedUrlTextBox" />
+        </Grid>
+
+        <Grid Grid.Row="3" ColumnDefinitions="* 14 *">
+            <Button Grid.Column="0" x:Name="OKButton" Classes="primary" Click="OKButton_Click" IsDefault="True" HorizontalAlignment="Stretch">OK</Button>
+            <Button Grid.Column="2" x:Name="CancelButton" Click="CancelButton_Click" IsCancel="True" HorizontalAlignment="Stretch">Cancel</Button>
+        </Grid>
+    </Grid>
+
+</Window>

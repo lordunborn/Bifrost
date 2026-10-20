@@ -1,0 +1,32 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="540" d:DesignHeight="495"
+             x:Class="OmegaLauncher.Avalonia.Views.Options.OptionsAboutUserControl">
+
+    <Grid RowDefinitions="auto *">
+        <HeaderedContentControl Grid.Row="0" Header="About">
+            <HeaderedContentControl.Styles>
+                <Style Selector="TextBlock">
+                    <Setter Property="TextWrapping" Value="Wrap" />
+                    <Setter Property="Margin" Value="4" />
+                </Style>
+            </HeaderedContentControl.Styles>
+
+            <StackPanel Spacing="0">
+                <TextBlock Text="Omega Launcher" FontWeight="SemiBold" />
+                <TextBlock Text="Version 0.0.0 (Configuration)" x:Name="VersionTextBlock" />
+                <TextBlock Text="Based on Bifrost by Crypto137 (MIT license)." />
+                <HyperlinkButton NavigateUri="https://github.com/Crypto137/Bifrost" Content="https://github.com/Crypto137/Bifrost" />
+            </StackPanel>
+        </HeaderedContentControl>
+
+        <HeaderedContentControl Grid.Row="1" Header="Licenses">
+            <ScrollViewer>
+                <TextBox IsReadOnly="True" BorderThickness="0" x:Name="LicenseTextBox"/>
+            </ScrollViewer>
+        </HeaderedContentControl>
+    </Grid>
+
+</UserControl>
