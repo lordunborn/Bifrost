@@ -74,7 +74,7 @@ namespace Bifrost.Core.ClientManagement
             {
                 string defaultNewsFeedUrl = GuiConfig.DefaultNewsFeedUrl;
                 if (string.IsNullOrWhiteSpace(defaultNewsFeedUrl) == false)
-                    NewsFeed.AddSource(defaultNewsFeedUrl, "Bifrost", NewsFeedSourceCategories.Default);
+                    NewsFeed.AddSource(defaultNewsFeedUrl, "MHServerEmu", NewsFeedSourceCategories.Default);
             }
 
             if (GuiConfig.NewsCategoryFilter.HasFlag(NewsFeedSourceCategories.Server))

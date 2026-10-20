@@ -36,7 +36,7 @@
                 <ListBoxItem>
                     <StackPanel>
                         <Image Source="/Assets/Icons/bifrost.png"/>
-                        <Label Content="Bifrost"/>
+                        <Label Content="Launcher"/>
                     </StackPanel>
                 </ListBoxItem>
                 <ListBoxItem>
