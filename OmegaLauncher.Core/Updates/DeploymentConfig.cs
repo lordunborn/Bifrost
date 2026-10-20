@@ -17,7 +17,7 @@ namespace OmegaLauncher.Core.Updates
         public string UpdateBaseUrl { get; set; } = string.Empty;
         public string UpdatePublicKey { get; set; } = string.Empty;
 
-        /// <summary>Shared secret that signs the content token passed to the game (-serveroverride). Must match the server's ContentTokenSecret; empty = no token.</summary>
+        /// <summary>Shared secret that signs the content token passed to the game (-twofactorauthname). Must match the server's ContentTokenSecret; empty = no token.</summary>
         public string ContentTokenSecret { get; set; } = string.Empty;
         public List<ServerInfo> Servers { get; set; } = new();
 

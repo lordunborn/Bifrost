@@ -5,7 +5,7 @@ using System.Text;
 namespace OmegaLauncher.Core.Updates
 {
     /// <summary>
-    /// The token the launcher passes to the game client (-serveroverride=, which the client sends in the login request) so the server can tell which version of the launcher-managed files the player has.
+    /// The token the launcher passes to the game client (-twofactorauthname=, which the client sends in the login request) so the server can tell which version of the launcher-managed files the player has.
     /// Format: "mho1.{contentVersion}.{first 32 hex characters of HMAC-SHA256(secret, "mho1.{contentVersion}")}".
     /// The server has the same algorithm (MHServerEmu.Core ClientContentToken); both are tested against the same fixed examples.
     /// </summary>

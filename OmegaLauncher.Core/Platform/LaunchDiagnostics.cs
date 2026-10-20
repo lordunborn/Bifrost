@@ -51,7 +51,7 @@ namespace OmegaLauncher.Core.Platform
 
             output.WriteLine("Command:");
             // The signature is not printed: this output gets pasted into bug reports.
-            output.WriteLine(System.Text.RegularExpressions.Regex.Replace(command.Describe(), @"(-serveroverride=mho1\.\d+\.)[0-9a-fA-F]+", "$1<hidden>"));
+            output.WriteLine(System.Text.RegularExpressions.Regex.Replace(command.Describe(), @"(-twofactorauthname=mho1\.\d+\.)[0-9a-fA-F]+", "$1<hidden>"));
             return 0;
         }
     }
