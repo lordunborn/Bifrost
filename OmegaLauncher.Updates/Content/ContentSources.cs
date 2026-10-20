@@ -39,7 +39,10 @@ namespace OmegaLauncher.Updates.Content
 
             _baseUri = new Uri(baseUrl);
             _attempts = Math.Max(1, attempts);
-            _http = new HttpClient { Timeout = timeout ?? TimeSpan.FromSeconds(60) };
+
+            // A server that cannot be reached at all must fail within seconds; only a slow transfer may take the full timeout.
+            SocketsHttpHandler handler = new() { ConnectTimeout = TimeSpan.FromSeconds(8) };
+            _http = new HttpClient(handler) { Timeout = timeout ?? TimeSpan.FromSeconds(60) };
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("MHOLauncher");
         }
 
@@ -67,6 +70,17 @@ namespace OmegaLauncher.Updates.Content
                         throw;
 
                     last = ex;
+
+                    // Nothing is listening, the name does not exist or there is no route: trying again will not change that.
+                    if (ex is HttpRequestException { InnerException: System.Net.Sockets.SocketException socketException } &&
+                        socketException.SocketErrorCode is System.Net.Sockets.SocketError.ConnectionRefused
+                            or System.Net.Sockets.SocketError.HostNotFound
+                            or System.Net.Sockets.SocketError.NetworkUnreachable
+                            or System.Net.Sockets.SocketError.HostUnreachable)
+                    {
+                        break;
+                    }
+
                     await Task.Delay(TimeSpan.FromMilliseconds(400 * attempt), cancellationToken);
                 }
             }

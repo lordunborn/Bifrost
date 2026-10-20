@@ -209,7 +209,8 @@ namespace OmegaLauncher.Avalonia.Views
 
         private async Task CheckForUpdatesAsync()
         {
-            SetControlsEnabled(false);
+            // Options and the server list do not touch the update state, so they stay usable while the check runs.
+            UpdatesButton.IsEnabled = false;
             SetPlayMode(PlayMode.Blocked);
             UpdateStatusTextBlock.Text = "Checking for updates...";
             SetFilesState(ReadyState.Unknown, "Checking...");
@@ -240,7 +241,7 @@ namespace OmegaLauncher.Avalonia.Views
             {
                 _updateCts.Dispose();
                 _updateCts = null;
-                SetControlsEnabled(true);
+                UpdatesButton.IsEnabled = true;
             }
         }
 

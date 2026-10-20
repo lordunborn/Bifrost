@@ -33,20 +33,33 @@ namespace OmegaLauncher.Updates.Client
     /// <summary>The launcher's entry points: check what is published against a client folder, apply it, or revert it.</summary>
     public static class UpdateService
     {
+        /// <summary>How long the server gets to answer the "what is published" questions before the launcher gives up and lets the player continue.</summary>
+        public static readonly TimeSpan DefaultServerTimeout = TimeSpan.FromSeconds(15);
+
         public static async Task<UpdateCheckResult> CheckAsync(IContentSource source, string publicKeyBase64, string clientRoot, int launcherVersion = int.MaxValue,
-            bool ignoreCache = false, IProgress<PlanProgress> progress = null, CancellationToken cancellationToken = default)
+            bool ignoreCache = false, IProgress<PlanProgress> progress = null, CancellationToken cancellationToken = default, TimeSpan? serverTimeout = null)
         {
+            TimeSpan timeout = serverTimeout ?? DefaultServerTimeout;
             byte[] manifestBytes;
             byte[] signatureBytes;
 
-            try
+            using (CancellationTokenSource deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
-                manifestBytes = await source.GetBytesAsync(UpdateConstants.ManifestFileName, cancellationToken);
-                signatureBytes = await source.GetBytesAsync(UpdateConstants.SignatureFileName, cancellationToken);
-            }
-            catch (IOException ex)
-            {
-                throw new UpdateException("The update server could not be reached. Check your connection and try again.", ex);
+                deadline.CancelAfter(timeout);
+
+                try
+                {
+                    manifestBytes = await source.GetBytesAsync(UpdateConstants.ManifestFileName, deadline.Token);
+                    signatureBytes = await source.GetBytesAsync(UpdateConstants.SignatureFileName, deadline.Token);
+                }
+                catch (IOException ex)
+                {
+                    throw new UpdateException("The update server could not be reached. Check your connection and try again.", ex);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested == false)
+                {
+                    throw new UpdateException("The update server did not answer in time. Check your connection and try again.");
+                }
             }
 
             if (manifestBytes == null || signatureBytes == null)
@@ -71,13 +84,22 @@ namespace OmegaLauncher.Updates.Client
                 LauncherStateStore.Save(folders, state);
 
             BaseCheckResult baseCheck = null;
-            try
+            using (CancellationTokenSource deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
             {
-                baseCheck = await BaseCheck.RunAsync(source, clientRoot, manifest, cancellationToken);
-            }
-            catch (Exception ex) when (ex is IOException or System.Text.Json.JsonException)
-            {
-                // The base check is advice only.
+                deadline.CancelAfter(timeout);
+
+                try
+                {
+                    baseCheck = await BaseCheck.RunAsync(source, clientRoot, manifest, deadline.Token);
+                }
+                catch (Exception ex) when (ex is IOException or System.Text.Json.JsonException)
+                {
+                    // The base check is advice only.
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested == false)
+                {
+                    // Too slow: skip the advice rather than hold the player up.
+                }
             }
 
             return new UpdateCheckResult
