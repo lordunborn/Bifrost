@@ -1,0 +1,58 @@
+using System.Text.Json;
+using Bifrost.Updates.Content;
+using Bifrost.Updates.Models;
+using Bifrost.Updates.Publishing;
+
+namespace Bifrost.Updates.Client
+{
+    public sealed class BaseCheckResult
+    {
+        public int FilesChecked { get; set; }
+        public List<string> Missing { get; } = new();
+        public List<string> WrongSize { get; } = new();
+
+        public bool Ok => Missing.Count == 0 && WrongSize.Count == 0;
+    }
+
+    /// <summary>
+    /// Fast sanity check of a player's stock client against the published list of stock file sizes (existence and size only, no hashing of 24 GB).
+    /// Files the launcher manages are skipped, because they are supposed to differ from stock.
+    /// </summary>
+    public static class BaseCheck
+    {
+        // Files only the Steam install has: a client obtained another way (depot download) legitimately lacks them.
+        private static readonly GlobMatcher Ignored = new(new[] { "*.vdf", "EmptySteamDepot/**", "InstallDependencies/**", "licenses.pdf", "*.dmp" });
+
+        public static async Task<BaseCheckResult> RunAsync(IContentSource source, string clientRoot, ClientManifest manifest, CancellationToken cancellationToken = default)
+        {
+            byte[] data = await source.GetBytesAsync(UpdateConstants.BaselineSizesFileName, cancellationToken);
+            if (data == null)
+                return null;
+
+            BaselineSizes sizes = JsonSerializer.Deserialize(data, UpdatesJsonContext.Default.BaselineSizes);
+            HashSet<string> managed = new(manifest.Files.Select(f => f.Path), StringComparer.OrdinalIgnoreCase);
+            foreach (string removed in manifest.Removed)
+                managed.Add(removed);
+
+            BaseCheckResult result = new();
+
+            foreach (BaselineSizeEntry entry in sizes.Files)
+            {
+                if (managed.Contains(entry.Path) || Ignored.IsMatch(entry.Path))
+                    continue;
+
+                cancellationToken.ThrowIfCancellationRequested();
+                result.FilesChecked++;
+
+                string path = ClientPathResolver.Resolve(clientRoot, entry.Path);
+                FileInfo info = new(path);
+                if (info.Exists == false)
+                    result.Missing.Add(entry.Path);
+                else if (info.Length != entry.Size)
+                    result.WrongSize.Add(entry.Path);
+            }
+
+            return result;
+        }
+    }
+}

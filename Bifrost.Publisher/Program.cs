@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Bifrost.Updates;
+using Bifrost.Updates.Client;
 using Bifrost.Updates.Content;
 using Bifrost.Updates.Models;
 using Bifrost.Updates.Publishing;
@@ -37,6 +38,9 @@ namespace Bifrost.Publisher
                     "publish" => Publish(options),
                     "verify" => Verify(options).GetAwaiter().GetResult(),
                     "serve" => Serve(options),
+                    "player-check" => PlayerCheck(options, apply: false).GetAwaiter().GetResult(),
+                    "player-update" => PlayerCheck(options, apply: true).GetAwaiter().GetResult(),
+                    "player-revert" => PlayerRevert(options),
                     _ => Fail($"Unknown command: {args[0]}")
                 };
             }
@@ -54,6 +58,11 @@ namespace Bifrost.Publisher
            [--exclude pattern]... [--exclude-file file] [--cache hashes.json] [--min-launcher N] [--optional] [--new-version]
   verify   <url or folder> --pubkey <file or base64> [--deep]
   serve    <folder> [--port 8099]
+
+Developer commands that act like a player's launcher (use a COPY of a client, never your working one):
+  player-check  <client folder> --host <url or folder> --pubkey <file or base64> [--full]
+  player-update <client folder> --host <url or folder> --pubkey <file or base64> [--full]
+  player-revert <client folder>
 ";
 
         private static int Fail(string message)
@@ -154,6 +163,68 @@ namespace Bifrost.Publisher
             return 2;
         }
 
+        private static IContentSource OpenSource(string target) =>
+            target.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || target.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                ? new HttpContentSource(target)
+                : new DirectoryContentSource(target);
+
+        private static async Task<int> PlayerCheck(Options o, bool apply)
+        {
+            string client = o.Positional(0, "client folder");
+            string key = o.Require("pubkey");
+            if (File.Exists(key))
+                key = File.ReadAllText(key).Trim();
+
+            IContentSource source = OpenSource(o.Require("host"));
+            string root = ClientInspector.FindClientRoot(client) ?? throw new ArgumentException("Not a Marvel Heroes folder.");
+
+            ClientInfo info = ClientInspector.Inspect(root);
+            Console.WriteLine($"Client: {root}");
+            Console.WriteLine($"Version: {info.Version ?? "unknown"}");
+
+            Progress<PlanProgress> planProgress = new(p => { if (p.CurrentFile != null) Console.Write($"\r  checking {p.FilesDone + 1}/{p.FilesTotal}  ".PadRight(40)); });
+            UpdateCheckResult check = await UpdateService.CheckAsync(source, key, root, ignoreCache: o.Flag("full"), progress: planProgress);
+            Console.WriteLine();
+
+            Console.WriteLine($"Installed content version: {check.InstalledContentVersion}; published: {check.Manifest.ContentVersion} ({(check.Manifest.Force ? "required" : "optional")})");
+            if (check.BaseCheck != null)
+                Console.WriteLine($"Stock files checked: {check.BaseCheck.FilesChecked}, missing {check.BaseCheck.Missing.Count}, wrong size {check.BaseCheck.WrongSize.Count}");
+
+            if (check.UpToDate)
+            {
+                Console.WriteLine("Up to date.");
+                return 0;
+            }
+
+            Console.WriteLine($"To update: {check.Plan.FileCount} files, download up to {check.Plan.DownloadBytes / 1048576.0:F1} MB (rebuilding {check.Plan.RebuildBytes / 1048576.0:F1} MB), remove {check.Plan.Removed.Count}.");
+            foreach (PlannedFile f in check.Plan.FilesToUpdate)
+                Console.WriteLine($"  {f.Manifest.Path}  {(f.Exists ? "update" : "new")}  {f.DownloadBytes / 1048576.0:F1} MB to download");
+
+            if (apply == false)
+                return 0;
+
+            DateTime lastPrint = DateTime.MinValue;
+            Progress<UpdateProgress> progress = new(p =>
+            {
+                if ((DateTime.UtcNow - lastPrint).TotalMilliseconds < 500) return;
+                lastPrint = DateTime.UtcNow;
+                Console.Write($"\r  [{p.FilesDone}/{p.FilesTotal}] {p.BytesDownloaded / 1048576.0:F1}/{p.BytesToDownload / 1048576.0:F1} MB  {p.CurrentFile}".PadRight(150)[..150]);
+            });
+
+            ApplyResult result = await UpdateService.ApplyAsync(check, source, root, progress);
+            Console.WriteLine();
+            Console.WriteLine($"Done: {result.FilesUpdated} files updated, {result.FilesRemoved} removed, {result.BytesDownloaded / 1048576.0:F1} MB downloaded.");
+            return 0;
+        }
+
+        private static int PlayerRevert(Options o)
+        {
+            string root = ClientInspector.FindClientRoot(o.Positional(0, "client folder")) ?? throw new ArgumentException("Not a Marvel Heroes folder.");
+            int reverted = UpdateService.Revert(root);
+            Console.WriteLine($"Reverted {reverted} files to stock.");
+            return 0;
+        }
+
         private static int Serve(Options o)
         {
             string folder = Path.GetFullPath(o.Positional(0, "folder"));
@@ -200,7 +271,7 @@ namespace Bifrost.Publisher
         private readonly Dictionary<string, List<string>> _values = new(StringComparer.OrdinalIgnoreCase);
         private readonly HashSet<string> _flags = new(StringComparer.OrdinalIgnoreCase);
 
-        private static readonly HashSet<string> FlagNames = new(StringComparer.OrdinalIgnoreCase) { "deep", "optional", "new-version" };
+        private static readonly HashSet<string> FlagNames = new(StringComparer.OrdinalIgnoreCase) { "deep", "optional", "new-version", "full" };
 
         public static Options Parse(string[] args)
         {

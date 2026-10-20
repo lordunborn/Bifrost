@@ -78,4 +78,25 @@ namespace Bifrost.Updates.Models
         public long MtimeTicks { get; set; }
         public string Sha256 { get; set; }
     }
+
+    /// <summary>What the launcher knows about the managed files it has installed in one client folder (stored in .mho/state.json).</summary>
+    public class LauncherState
+    {
+        public int ContentVersion { get; set; }
+        public Dictionary<string, StateFile> Files { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    }
+
+    public class StateFile
+    {
+        public long Size { get; set; }
+        public long MtimeTicks { get; set; }
+        public string Sha256 { get; set; }
+
+        /// <summary>True if the launcher replaced a file that was there before (its original is kept in .mho/backup for Revert); false if the launcher added the file.</summary>
+        public bool HadOriginal { get; set; }
+
+        /// <summary>True if the file already matched the manifest when the launcher first looked (a developer's own client, or files copied by hand). It is remembered
+        /// only to skip hashing; the launcher never deletes or restores an adopted file.</summary>
+        public bool Adopted { get; set; }
+    }
 }
