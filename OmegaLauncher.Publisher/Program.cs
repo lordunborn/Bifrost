@@ -38,6 +38,7 @@ namespace OmegaLauncher.Publisher
                     "publish" => Publish(options),
                     "verify" => Verify(options).GetAwaiter().GetResult(),
                     "serve" => Serve(options),
+                    "publish-launcher" => PublishLauncher(options),
                     "player-check" => PlayerCheck(options, apply: false).GetAwaiter().GetResult(),
                     "player-update" => PlayerCheck(options, apply: true).GetAwaiter().GetResult(),
                     "player-revert" => PlayerRevert(options),
@@ -57,6 +58,7 @@ namespace OmegaLauncher.Publisher
   publish  <edited client> --baseline baseline.json --key private.pem [--out host] [--notes ""text""]
            [--exclude pattern]... [--exclude-file file] [--cache hashes.json] [--min-launcher N] [--optional] [--new-version]
   verify   <url or folder> --pubkey <file or base64> [--deep]
+  publish-launcher <built program> --platform win-x64 --version 1.0.1 --key private.pem [--out host] [--notes ""text""]
   serve    <folder> [--port 8099]
 
 Developer commands that act like a player's launcher (use a COPY of a client, never your working one):
@@ -100,6 +102,21 @@ Developer commands that act like a player's launcher (use a COPY of a client, ne
             ClientBaseline baseline = BaselineBuilder.Build(root, version, Console.WriteLine);
             File.WriteAllBytes(output, JsonSerializer.SerializeToUtf8Bytes(baseline, UpdatesJsonContext.Default.ClientBaseline));
             Console.WriteLine($"Wrote {output}: {baseline.Files.Count} files, {baseline.Files.Sum(f => f.Size) / 1073741824.0:F1} GB.");
+            return 0;
+        }
+
+        private static int PublishLauncher(Options o)
+        {
+            LauncherRelease release = LauncherPublisher.Publish(
+                o.Positional(0, "built launcher program"),
+                o.Require("platform"),
+                o.Require("version"),
+                o.Require("key"),
+                o.Get("out") ?? "host",
+                o.Get("notes") ?? string.Empty);
+
+            Console.WriteLine($"Launcher {release.Version}: {string.Join(", ", release.Files.Select(f => f.Platform))}");
+            Console.WriteLine($"Upload the CONTENTS of '{o.Get("out") ?? "host"}/launcher' to the host's client/launcher folder (program files first, latest.sig and latest.json last).");
             return 0;
         }
 

@@ -14,6 +14,7 @@ using OmegaLauncher.Core.News;
 using OmegaLauncher.Core.Platform;
 using OmegaLauncher.Core.Updates;
 using OmegaLauncher.Updates.Client;
+using OmegaLauncher.Updates.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -170,6 +171,10 @@ namespace OmegaLauncher.Avalonia.Views
 
             _updateManager = new(_clientLauncher.Deployment, _clientLauncher.ClientRoot);
 
+            // A newer launcher goes first: it may be the one that understands the newest client files.
+            if (await TryUpdateLauncherAsync())
+                return;
+
             if (_clientLauncher.GuiConfig.AutoCheckUpdates || Program.AutoPlay)
                 await CheckForUpdatesAsync();
             else
@@ -184,6 +189,63 @@ namespace OmegaLauncher.Avalonia.Views
                     await RunUpdateAsync(launchAfter: true);
                 else if (_playMode == PlayMode.Play)
                     await LaunchAsync();
+            }
+        }
+
+        /// <summary>Offers the launcher update the server publishes. Returns true when the launcher is restarting into the new version.</summary>
+        private async Task<bool> TryUpdateLauncherAsync()
+        {
+            if (SelfUpdate.IsSupported == false)
+                return false;
+
+            DeploymentConfig deployment = _clientLauncher.Deployment;
+            LauncherUpdateInfo info;
+
+            UpdateStatusTextBlock.Text = "Checking for a newer launcher...";
+
+            try
+            {
+                using HttpContentSource source = new(deployment.UpdateBaseUrl, 2, TimeSpan.FromSeconds(15));
+                using CancellationTokenSource deadline = new(UpdateService.DefaultServerTimeout);
+                info = await LauncherUpdater.CheckAsync(source, deployment.UpdatePublicKey, SelfUpdate.CurrentVersion, LauncherUpdater.CurrentPlatform(), deadline.Token);
+            }
+            catch (Exception)
+            {
+                // Server problems are reported by the client file check that follows.
+                return false;
+            }
+
+            if (info == null)
+                return false;
+
+            string size = UpdateManager.FormatBytes(info.File.Size);
+            string notes = string.IsNullOrWhiteSpace(info.Release.Notes) ? string.Empty : "\n\n" + info.Release.Notes;
+            DialogResult answer = await MessageBoxWindow.Show(this,
+                $"Omega Launcher {info.Version} is available (you have {SelfUpdate.CurrentVersion}). Download it ({size}) and restart now?{notes}",
+                "Launcher update", MessageBoxType.OKCancel);
+
+            if (answer != DialogResult.OK)
+                return false;
+
+            SetControlsEnabled(false);
+            SetPlayMode(PlayMode.Blocked);
+            UpdateStatusTextBlock.Text = $"Downloading launcher {info.Version} ({size})...";
+
+            try
+            {
+                using HttpContentSource download = new(deployment.UpdateBaseUrl, 2, TimeSpan.FromMinutes(10));
+                await LauncherUpdater.DownloadAsync(download, info, SelfUpdate.DownloadPath);
+                await Task.Run(() => SelfUpdate.Install(SelfUpdate.CurrentExecutablePath, SelfUpdate.DownloadPath));
+
+                SelfUpdate.Restart();
+                Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxWindow.Show(this, "The launcher could not be updated: " + ex.Message, "Launcher update");
+                SetControlsEnabled(true);
+                return false;
             }
         }
 

@@ -7,6 +7,7 @@ namespace OmegaLauncher.Updates.Models
     [JsonSerializable(typeof(BaselineSizes))]
     [JsonSerializable(typeof(HashCache))]
     [JsonSerializable(typeof(LauncherState))]
+    [JsonSerializable(typeof(LauncherRelease))]
     [JsonSourceGenerationOptions(WriteIndented = false, DefaultIgnoreCondition = JsonIgnoreCondition.Never)]
     public partial class UpdatesJsonContext : JsonSerializerContext
     {

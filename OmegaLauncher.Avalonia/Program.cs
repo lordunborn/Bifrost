@@ -20,6 +20,7 @@ namespace OmegaLauncher.Avalonia
                 return;
             }
 
+            OmegaLauncher.Core.Updates.SelfUpdate.CleanUpLeftovers();
             AutoPlay = Array.Exists(args, arg => string.Equals(arg, "--autoplay", StringComparison.OrdinalIgnoreCase));
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }

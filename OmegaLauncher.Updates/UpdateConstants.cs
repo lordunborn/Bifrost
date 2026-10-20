@@ -15,5 +15,10 @@ namespace OmegaLauncher.Updates
         public const string SignatureFileName = "manifest.sig";
         public const string BaselineSizesFileName = "baseline-sizes.json";
         public const string ChunkDirectory = "chunks";
+
+        // Launcher self-update: a signed description of the newest launcher plus the program files, next to the client content.
+        public const string LauncherDirectory = "launcher";
+        public const string LauncherReleaseFileName = "launcher/latest.json";
+        public const string LauncherReleaseSignatureFileName = "launcher/latest.sig";
     }
 }
