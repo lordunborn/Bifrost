@@ -2,159 +2,259 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="820" d:DesignHeight="660"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
         x:Class="Bifrost.Avalonia.Views.MainWindow"
-        Title="Bifrost"
-        Width="820" Height="660" CanResize="false"
+        Title="Marvel Heroes Omega"
+        Width="1280" Height="800" MinWidth="640" MinHeight="400"
         WindowStartupLocation="CenterScreen"
         Opened="Window_Opened"
         Closed="Window_Closed">
 
-    <Window.Styles>
-        <Style Selector="TextBlock.server-status">
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
-            <Setter Property="FontSize" Value="20" />
-        </Style>
+    <!-- The whole launcher is drawn on a fixed 1280x800 canvas (the Steam Deck screen) and scaled to the window, so it looks the same everywhere. -->
+    <Viewbox Stretch="Uniform">
+        <Grid Width="1280" Height="800" RowDefinitions="96 * 72" x:Name="MainGrid" KeyboardNavigation.TabNavigation="Cycle">
 
-        <Style Selector="TextBlock.news-header">
-            <Setter Property="Margin" Value="10 10 40 10" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
-            <Setter Property="FontSize" Value="30" />
-            <Setter Property="Foreground" Value="#ffaa00" />
-        </Style>
+            <Grid.Background>
+                <ImageBrush Source="/Assets/Images/background.png" Stretch="UniformToFill" />
+            </Grid.Background>
 
-        <Style Selector="HyperlinkButton.news-item">
-            <Setter Property="Width" Value="270" />
-            <Setter Property="Height" Value="90" />
-            <Setter Property="Background" Value="#80000000" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="BorderThickness" Value="4 0 0 0" />
+            <Grid.Styles>
+                <Style Selector="TextBlock">
+                    <Setter Property="Foreground" Value="#E8EEF5" />
+                </Style>
 
-            <Style Selector="^ TextBlock">
-                <Setter Property="Margin" Value="10" />
-                <!-- <Setter Property="TextAlignment" Value="Right" /> doesn't work correctly with wrapping -->
-                <Setter Property="VerticalAlignment" Value="Bottom" />
-                <Setter Property="TextWrapping" Value="Wrap" />
-                <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
-                <Setter Property="FontSize" Value="18" />
-                <Setter Property="Foreground" Value="#00aaff" />
-                <Setter Property="TextDecorations" Value="{x:Null}" />
-            </Style>
-        </Style>
+                <Style Selector="TextBlock.heading">
+                    <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
+                </Style>
 
-        <Style Selector="HyperlinkButton.news-item:pointerover">
-            <Style Selector="^ TextBlock">
-                <Setter Property="Foreground" Value="#FFFFFF" />
-            </Style>
-        </Style>
+                <Style Selector="TextBlock.caption">
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="Foreground" Value="#8FA3B8" />
+                    <Setter Property="LetterSpacing" Value="1" />
+                </Style>
 
-        <Style Selector="ScrollBar:vertical">
-            <Style Selector="^ /template/ RepeatButton">
-                <Setter Property="Background" Value="{x:Null}" />
-            </Style>
-            <Style Selector="^ /template/ Border">
-                <Setter Property="Background" Value="{x:Null}" />
-            </Style>
-        </Style>
+                <Style Selector="Border.card">
+                    <Setter Property="Background" Value="#CC0A111A" />
+                    <Setter Property="BorderBrush" Value="#33FFFFFF" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="14" />
+                    <Setter Property="Padding" Value="28" />
+                </Style>
 
-        <Style Selector="Button">
-            <Setter Property="Background" Value="#0088cc" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
-            <Setter Property="FontSize" Value="22" />
-        </Style>
+                <Style Selector="Border.ready-icon">
+                    <Setter Property="Width" Value="32" />
+                    <Setter Property="Height" Value="32" />
+                    <Setter Property="CornerRadius" Value="16" />
+                    <Setter Property="VerticalAlignment" Value="Top" />
+                </Style>
 
-        <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#00aaff" />
-        </Style>
+                <Style Selector="Border.ready-icon > TextBlock">
+                    <Setter Property="FontSize" Value="18" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="Foreground" Value="#06140B" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
 
-        <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#00aaff" />
-        </Style>
+                <Style Selector="HyperlinkButton.news-item">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="MinHeight" Value="84" />
+                    <Setter Property="Background" Value="#99000000" />
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="BorderThickness" Value="4 0 0 0" />
 
-        <Style Selector="Button.play-button">
-            <Setter Property="Background" Value="#0f9c23" />
-            <Setter Property="FontSize" Value="38" />
-        </Style>
+                    <Style Selector="^ TextBlock">
+                        <Setter Property="Margin" Value="14 12" />
+                        <Setter Property="VerticalAlignment" Value="Bottom" />
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                        <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
+                        <Setter Property="FontSize" Value="22" />
+                        <Setter Property="Foreground" Value="#35B6FF" />
+                        <Setter Property="TextDecorations" Value="{x:Null}" />
+                    </Style>
+                </Style>
 
-        <Style Selector="Button.play-button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#05d122" />
-        </Style>
+                <Style Selector="HyperlinkButton.news-item:pointerover">
+                    <Style Selector="^ TextBlock">
+                        <Setter Property="Foreground" Value="#FFFFFF" />
+                    </Style>
+                </Style>
 
-        <Style Selector="Button.play-button:pressed /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#05d122" />
-        </Style>
+                <Style Selector="ScrollBar:vertical">
+                    <Style Selector="^ /template/ RepeatButton">
+                        <Setter Property="Background" Value="{x:Null}" />
+                    </Style>
+                    <Style Selector="^ /template/ Border">
+                        <Setter Property="Background" Value="{x:Null}" />
+                    </Style>
+                </Style>
 
-    </Window.Styles>
-    
-    <Grid RowDefinitions="30 * 95" x:Name="MainGrid">
+                <Style Selector="Button">
+                    <Setter Property="Background" Value="#1B2B3F" />
+                    <Setter Property="Foreground" Value="#E8EEF5" />
+                    <Setter Property="BorderBrush" Value="#44607F" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="CornerRadius" Value="10" />
+                    <Setter Property="FontSize" Value="20" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="Padding" Value="24 0" />
+                    <Setter Property="Height" Value="52" />
+                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                </Style>
 
-        <Grid.Background>
-            <ImageBrush Source="/Assets/Images/background.png" />
-        </Grid.Background>
+                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#27405D" />
+                </Style>
 
-        <!-- Server Status -->
-        <Grid Grid.Row="0" ColumnDefinitions="* 270 30" IsVisible="False">
-            <Border Grid.Column="1" Grid.Row="0" Background="#80000000">
-                <TextBlock Classes="server-status" >Server Status: <Span Foreground="#00cc00">Online</Span></TextBlock>
-            </Border>
-        </Grid>
+                <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#27405D" />
+                </Style>
 
-        <!-- News -->
-        <Grid Grid.Row="1" ColumnDefinitions="* 320" RowDefinitions="84 *" Margin="10" x:Name="NewsGrid">
-            <!-- News -->
-            <TextBlock Grid.Column="1" Grid.Row="0" Classes="news-header" Text="News">
-                <TextBlock.Effect>
-                    <DropShadowDirectionEffect Color="#80FFAA00" Direction="0" />
-                </TextBlock.Effect>
-            </TextBlock>
-            <ScrollViewer Grid.Column="1" Grid.Row="1">
-                <StackPanel Spacing="12" Margin="24 0 0 0" x:Name="NewsItemStackPanel">
-                    <!-- These are just placeholders that will be replaced in code. -->
-                    <HyperlinkButton Classes="news-item">
-                        <TextBlock>Midtown Madness, Vibranium Mines One-Shot, and More</TextBlock>
-                    </HyperlinkButton>
-                    <HyperlinkButton Classes="news-item">
-                        <TextBlock>Psylocke Presale Now Available!</TextBlock>
-                    </HyperlinkButton>
-                    <HyperlinkButton Classes="news-item">
-                        <TextBlock>Deadpool Battle of the Atom, Moon Knight Marvel Now! Costumes Now Available!</TextBlock>
-                    </HyperlinkButton>
-                    <HyperlinkButton Classes="news-item">
-                        <TextBlock>Bounty Hunter Week, Fortune Mark 6 and More!</TextBlock>
-                    </HyperlinkButton>
+                <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Opacity" Value="0.45" />
+                </Style>
+
+                <!-- Keyboard / D-pad focus ring, visible on every focusable control. -->
+                <Style Selector="Button:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="BorderBrush" Value="#FFFFFF" />
+                    <Setter Property="BorderThickness" Value="3" />
+                </Style>
+
+                <Style Selector="ComboBox:focus-visible">
+                    <Setter Property="BorderBrush" Value="#FFFFFF" />
+                    <Setter Property="BorderThickness" Value="3" />
+                </Style>
+
+                <Style Selector="Button.play-button">
+                    <Setter Property="Background" Value="#18A62E" />
+                    <Setter Property="BorderBrush" Value="#5CE27A" />
+                    <Setter Property="CornerRadius" Value="14" />
+                    <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
+                    <Setter Property="FontSize" Value="64" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Setter Property="Height" Value="128" />
+                </Style>
+
+                <Style Selector="Button.play-button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#1FD13C" />
+                </Style>
+
+                <Style Selector="Button.play-button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#1FD13C" />
+                </Style>
+
+                <Style Selector="ComboBox">
+                    <Setter Property="Height" Value="52" />
+                    <Setter Property="FontSize" Value="20" />
+                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                    <Setter Property="CornerRadius" Value="10" />
+                </Style>
+            </Grid.Styles>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" Background="#B3060A10" ColumnDefinitions="* Auto Auto" Margin="0">
+                <StackPanel Grid.Column="0" Margin="40 0 0 0" VerticalAlignment="Center" Spacing="0">
+                    <TextBlock Classes="heading" FontSize="52" Text="Marvel Heroes Omega" />
+                    <TextBlock Classes="caption" Text="PRIVATE SERVER LAUNCHER" />
                 </StackPanel>
-            </ScrollViewer>
-        </Grid>
-        
-        <!-- Bottom Controls -->
-        <Grid Grid.Row="2" Background="#80090909">
-            <Grid ColumnDefinitions="180 * 180 80 180" RowDefinitions="* *" Margin="10" ColumnSpacing="10" x:Name="BottomControlsGrid">
-                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="12" x:Name="VersionTextBlock">Game Version: Unknown</TextBlock>
 
-                <!-- Update status -->
-                <StackPanel Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="0" VerticalAlignment="Center" Spacing="3">
-                    <TextBlock x:Name="UpdateStatusTextBlock" FontSize="12" TextWrapping="Wrap" TextAlignment="Right" />
-                    <ProgressBar x:Name="UpdateProgressBar" Minimum="0" Maximum="100" Height="6" IsVisible="False" />
-                </StackPanel>
-
-                <Button Grid.Column="0" Grid.Row="1" x:Name="OptionsButton" Click="OptionsButton_Click">Options</Button>
-
-                <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" x:Name="UpdatesButton" Click="UpdatesButton_Click">Updates</Button>
-
-                <ComboBox Grid.Column="2" Grid.Row="1" SelectedIndex="0" x:Name="ServerComboBox" SelectionChanged="ServerComboBox_SelectionChanged">
+                <ComboBox Grid.Column="1" Width="300" Margin="0 0 12 0" VerticalAlignment="Center" SelectedIndex="0" x:Name="ServerComboBox" SelectionChanged="ServerComboBox_SelectionChanged">
                     <ComboBoxItem Content="Local Server" />
                 </ComboBox>
 
-                <Button Grid.Column="3" Grid.Row="1" x:Name="ManageServersButton" Click="ManageServersButton_Click">Manage</Button>
-                <Button Grid.Column="4" Grid.RowSpan="2" Classes="play-button" x:Name="PlayButton" Click="PlayButton_Click">Play</Button>
+                <Button Grid.Column="2" Margin="0 0 40 0" VerticalAlignment="Center" x:Name="ManageServersButton" Click="ManageServersButton_Click">Manage servers</Button>
             </Grid>
-        </Grid>
 
-    </Grid>
+            <!-- Body -->
+            <Grid Grid.Row="1" ColumnDefinitions="* 24 400" Margin="40 28 40 24">
+
+                <!-- Play and status -->
+                <Grid Grid.Column="0" RowDefinitions="Auto * " RowSpacing="20">
+                    <Border Grid.Row="0" Classes="card">
+                        <Grid ColumnDefinitions="* 24 320">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="10">
+                                <TextBlock Classes="caption" Text="STATUS" />
+                                <TextBlock FontSize="26" FontWeight="SemiBold" TextWrapping="Wrap" MinHeight="70" x:Name="UpdateStatusTextBlock" Text="Starting..." />
+                                <ProgressBar Minimum="0" Maximum="100" Height="10" IsVisible="False" x:Name="UpdateProgressBar" />
+                            </StackPanel>
+
+                            <Button Grid.Column="2" Classes="play-button" x:Name="PlayButton" Click="PlayButton_Click">Play</Button>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Row="1" Classes="card">
+                        <StackPanel Spacing="20">
+                            <TextBlock Classes="caption" Text="READY CHECK" />
+
+                            <Grid ColumnDefinitions="32 14 *">
+                                <Border Grid.Column="0" Classes="ready-icon" Background="#6B7C8F" x:Name="ClientIcon"><TextBlock x:Name="ClientIconText" Text="?" /></Border>
+                                <StackPanel Grid.Column="2" Spacing="2">
+                                    <TextBlock FontSize="22" FontWeight="SemiBold" Text="Game client" />
+                                    <TextBlock FontSize="17" Foreground="#9FB2C6" x:Name="VersionTextBlock" Text="Not checked" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="32 14 *">
+                                <Border Grid.Column="0" Classes="ready-icon" Background="#6B7C8F" x:Name="FilesIcon"><TextBlock x:Name="FilesIconText" Text="?" /></Border>
+                                <StackPanel Grid.Column="2" Spacing="2">
+                                    <TextBlock FontSize="22" FontWeight="SemiBold" Text="Client files" />
+                                    <TextBlock FontSize="17" Foreground="#9FB2C6" x:Name="FilesDetailTextBlock" Text="Not checked" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="32 14 *">
+                                <Border Grid.Column="0" Classes="ready-icon" Background="#6B7C8F" x:Name="RunnerIcon"><TextBlock x:Name="RunnerIconText" Text="?" /></Border>
+                                <StackPanel Grid.Column="2" Spacing="2">
+                                    <TextBlock FontSize="22" FontWeight="SemiBold" Text="Runs with" />
+                                    <TextBlock FontSize="17" Foreground="#9FB2C6" x:Name="RunnerDetailTextBlock" Text="Not checked" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="32 14 *">
+                                <Border Grid.Column="0" Classes="ready-icon" Background="#6B7C8F" x:Name="ServerIcon"><TextBlock x:Name="ServerIconText" Text="?" /></Border>
+                                <StackPanel Grid.Column="2" Spacing="2">
+                                    <TextBlock FontSize="22" FontWeight="SemiBold" Text="Server" />
+                                    <TextBlock FontSize="17" Foreground="#9FB2C6" x:Name="ServerDetailTextBlock" Text="None selected" />
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- News -->
+                <Grid Grid.Column="2" RowDefinitions="Auto *" x:Name="NewsGrid">
+                    <TextBlock Grid.Row="0" Classes="heading" FontSize="40" Foreground="#FFAA00" Margin="0 0 0 10" Text="News" />
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="12" Margin="0 0 12 0" x:Name="NewsItemStackPanel">
+                            <!-- These are just placeholders that will be replaced in code. -->
+                            <HyperlinkButton Classes="news-item">
+                                <TextBlock>Midtown Madness, Vibranium Mines One-Shot, and More</TextBlock>
+                            </HyperlinkButton>
+                            <HyperlinkButton Classes="news-item">
+                                <TextBlock>Psylocke Presale Now Available!</TextBlock>
+                            </HyperlinkButton>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+
+            <!-- Footer -->
+            <Grid Grid.Row="2" Background="#B3060A10" ColumnDefinitions="Auto * Auto Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" Margin="40 0 0 0" VerticalAlignment="Center">
+                    <Border Width="30" Height="30" CornerRadius="15" Background="#2FBF5B"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#06140B" Text="A" /></Border>
+                    <TextBlock VerticalAlignment="Center" FontSize="17" Foreground="#9FB2C6" Text="Select" />
+                    <Border Width="30" Height="30" CornerRadius="15" Background="#E5484D" Margin="14 0 0 0"><TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="#1A0608" Text="B" /></Border>
+                    <TextBlock VerticalAlignment="Center" FontSize="17" Foreground="#9FB2C6" Text="Back" />
+                </StackPanel>
+
+                <Button Grid.Column="2" Margin="0 0 12 0" Width="200" x:Name="UpdatesButton" Click="UpdatesButton_Click">Updates</Button>
+                <Button Grid.Column="3" Margin="0 0 40 0" Width="200" x:Name="OptionsButton" Click="OptionsButton_Click">Options</Button>
+            </Grid>
+
+        </Grid>
+    </Viewbox>
 
 </Window>

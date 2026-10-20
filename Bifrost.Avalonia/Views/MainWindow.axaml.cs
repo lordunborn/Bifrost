@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -10,6 +11,7 @@ using Bifrost.Avalonia.Views.Options;
 using Bifrost.Core.ClientManagement;
 using Bifrost.Core.Models;
 using Bifrost.Core.News;
+using Bifrost.Core.Platform;
 using Bifrost.Core.Updates;
 using Bifrost.Updates.Client;
 using System;
@@ -31,6 +33,19 @@ namespace Bifrost.Avalonia.Views
             Cancel,     // an update is running
             Blocked     // checking, or the client cannot be used (wrong version, launcher too old)
         }
+
+        private enum ReadyState
+        {
+            Unknown,
+            Ok,
+            Warning,
+            Problem
+        }
+
+        private static readonly IBrush ReadyUnknownBrush = SolidColorBrush.Parse("#6B7C8F");
+        private static readonly IBrush ReadyOkBrush = SolidColorBrush.Parse("#2FBF5B");
+        private static readonly IBrush ReadyWarningBrush = SolidColorBrush.Parse("#F5A524");
+        private static readonly IBrush ReadyProblemBrush = SolidColorBrush.Parse("#E5484D");
 
         private ClientLauncher _clientLauncher;
         private UpdateManager _updateManager;
@@ -147,7 +162,8 @@ namespace Bifrost.Avalonia.Views
 
             if (_clientLauncher.Deployment.UpdatesConfigured == false)
             {
-                UpdateStatusTextBlock.Text = string.Empty;
+                UpdateStatusTextBlock.Text = "Ready to play.";
+                SetFilesState(ReadyState.Unknown, "Updates are not set up for this launcher");
                 SetPlayMode(PlayMode.Play);
                 return;
             }
@@ -157,7 +173,10 @@ namespace Bifrost.Avalonia.Views
             if (_clientLauncher.GuiConfig.AutoCheckUpdates || Program.AutoPlay)
                 await CheckForUpdatesAsync();
             else
+            {
                 UpdateStatusTextBlock.Text = "Updates not checked. Open Updates to check.";
+                SetFilesState(ReadyState.Unknown, "Not checked");
+            }
 
             if (Program.AutoPlay && _updateCheckSucceeded)
             {
@@ -193,6 +212,7 @@ namespace Bifrost.Avalonia.Views
             SetControlsEnabled(false);
             SetPlayMode(PlayMode.Blocked);
             UpdateStatusTextBlock.Text = "Checking for updates...";
+            SetFilesState(ReadyState.Unknown, "Checking...");
             _updateCheckSucceeded = false;
             _updateCts = new();
 
@@ -206,12 +226,14 @@ namespace Bifrost.Avalonia.Views
             catch (OperationCanceledException)
             {
                 UpdateStatusTextBlock.Text = "Update check cancelled.";
+                SetFilesState(ReadyState.Unknown, "Not checked");
                 SetPlayMode(PlayMode.Play);
             }
             catch (Exception ex)
             {
                 // Could not tell whether the client is current (offline, host down, bad signature). The server decides whether this client may play.
                 UpdateStatusTextBlock.Text = ex is UpdateException ? ex.Message : "Could not check for updates: " + ex.Message;
+                SetFilesState(ReadyState.Warning, "Could not check for updates");
                 SetPlayMode(PlayMode.Play);
             }
             finally
@@ -229,6 +251,7 @@ namespace Bifrost.Avalonia.Views
             if (check.LauncherTooOld)
             {
                 UpdateStatusTextBlock.Text = text;
+                SetFilesState(ReadyState.Problem, "Launcher is too old for this server");
                 SetPlayMode(PlayMode.Blocked);
                 return;
             }
@@ -236,6 +259,8 @@ namespace Bifrost.Avalonia.Views
             if (UpdateManager.HasWrongBaseVersion(check, _clientVersion))
             {
                 UpdateStatusTextBlock.Text = $"Wrong game version {_clientVersion}: the server needs {check.Manifest.BaseClientVersion}. See Updates.";
+                SetReady(ClientIcon, ClientIconText, VersionTextBlock, ReadyState.Problem, $"Version {_clientVersion}, needs {check.Manifest.BaseClientVersion}");
+                SetFilesState(ReadyState.Warning, "Needs the right game version first");
                 SetPlayMode(PlayMode.Blocked);
                 return;
             }
@@ -244,6 +269,13 @@ namespace Bifrost.Avalonia.Views
                 text += " (some stock game files look wrong, see Updates)";
 
             UpdateStatusTextBlock.Text = text;
+
+            if (check.UpToDate)
+                SetFilesState(check.BaseCheck != null && check.BaseCheck.Ok == false ? ReadyState.Warning : ReadyState.Ok,
+                    check.BaseCheck != null && check.BaseCheck.Ok == false ? $"Up to date, but {check.BaseCheck.Missing.Count + check.BaseCheck.WrongSize.Count} stock file(s) look wrong" : $"Up to date (version {check.Manifest.ContentVersion})");
+            else
+                SetFilesState(check.Required ? ReadyState.Problem : ReadyState.Warning, $"{check.Plan.FileCount} file(s) to update, {UpdateManager.FormatBytes(check.Plan.DownloadBytes)}");
+
             SetPlayMode(check.Required ? PlayMode.Update : PlayMode.Play);
         }
 
@@ -281,12 +313,14 @@ namespace Bifrost.Avalonia.Views
             catch (OperationCanceledException)
             {
                 UpdateStatusTextBlock.Text = "Update cancelled. You can continue it later.";
+                SetFilesState(ReadyState.Warning, "Update not finished");
                 SetPlayMode(PlayMode.Update);
                 launchAfter = false;
             }
             catch (Exception ex)
             {
                 UpdateStatusTextBlock.Text = ex is UpdateException ? ex.Message : "The update failed: " + ex.Message;
+                SetFilesState(ReadyState.Problem, "Update failed");
                 SetPlayMode(PlayMode.Update);
                 launchAfter = false;
             }
@@ -322,13 +356,63 @@ namespace Bifrost.Avalonia.Views
             }
         }
 
+        private static void SetReady(Border icon, TextBlock iconText, TextBlock detail, ReadyState state, string text)
+        {
+            icon.Background = state switch
+            {
+                ReadyState.Ok => ReadyOkBrush,
+                ReadyState.Warning => ReadyWarningBrush,
+                ReadyState.Problem => ReadyProblemBrush,
+                _ => ReadyUnknownBrush
+            };
+
+            iconText.Text = state switch
+            {
+                ReadyState.Ok => "\u2713",
+                ReadyState.Warning => "!",
+                ReadyState.Problem => "\u2715",
+                _ => "?"
+            };
+
+            detail.Text = text;
+        }
+
+        private void SetFilesState(ReadyState state, string text)
+        {
+            SetReady(FilesIcon, FilesIconText, FilesDetailTextBlock, state, text);
+        }
+
+        private void RefreshServerRow()
+        {
+            ServerInfo server = _clientLauncher?.ServerManager.GetServer(ServerComboBox.SelectedIndex);
+            if (server == null)
+                SetReady(ServerIcon, ServerIconText, ServerDetailTextBlock, ReadyState.Problem, "No server selected");
+            else
+                SetReady(ServerIcon, ServerIconText, ServerDetailTextBlock, ReadyState.Ok, server.Name);
+        }
+
+        private void RefreshRunner()
+        {
+            if (OperatingSystem.IsLinux() == false)
+            {
+                SetReady(RunnerIcon, RunnerIconText, RunnerDetailTextBlock, ReadyState.Ok, "Windows (native)");
+                return;
+            }
+
+            GameRunner runner = _clientLauncher.FindRunners().FirstOrDefault();
+            if (runner == null)
+                SetReady(RunnerIcon, RunnerIconText, RunnerDetailTextBlock, ReadyState.Problem, "Nothing found. Install Proton-GE, umu-launcher or Wine.");
+            else
+                SetReady(RunnerIcon, RunnerIconText, RunnerDetailTextBlock, ReadyState.Ok, runner.Name);
+        }
+
         private void ApplyTheme(string name)
         {
             LauncherTheme theme = ThemeManager.Instance.GetTheme(name);
             if (theme == null)
                 return;
 
-            ImageBrush imageBrush = new() { Source = theme.Background };
+            ImageBrush imageBrush = new() { Source = theme.Background, Stretch = Stretch.UniformToFill };
             MainGrid.Background = imageBrush;
         }
 
@@ -389,7 +473,9 @@ namespace Bifrost.Avalonia.Views
             if (version == ClientMetadata.Unknown.Version && _clientVersion != null)
                 version = _clientVersion;
 
-            VersionTextBlock.Text = $"Game Version: {version}";
+            bool versionKnown = version != ClientMetadata.Unknown.Version;
+            SetReady(ClientIcon, ClientIconText, VersionTextBlock, versionKnown ? ReadyState.Ok : ReadyState.Warning, versionKnown ? $"Version {version}" : "Version could not be read");
+            RefreshRunner();
         }
 
         private void RefreshServerComboBox()
@@ -402,14 +488,22 @@ namespace Bifrost.Avalonia.Views
             }
 
             ServerComboBox.SelectedIndex = _clientLauncher.LaunchConfig.ServerIndex;
+            RefreshServerRow();
         }
 
         #region Event Handlers
 
         private async void Window_Opened(object sender, EventArgs e)
         {
-            if (Design.IsDesignMode == false)
-                await InitializeAsync();
+            if (Design.IsDesignMode)
+                return;
+
+            // On a screen no bigger than the Deck's, use all of it; the 1280x800 canvas scales to fit.
+            PixelRect area = Screens.ScreenFromWindow(this)?.WorkingArea ?? default;
+            if (area.Width > 0 && (area.Width < 1300 || area.Height < 860))
+                WindowState = WindowState.Maximized;
+
+            await InitializeAsync();
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -446,6 +540,7 @@ namespace Bifrost.Avalonia.Views
                 return;
 
             _clientLauncher.LaunchConfig.ServerIndex = selectedIndex;
+            RefreshServerRow();
         }
 
         private async void ManageServersButton_Click(object sender, RoutedEventArgs e)
