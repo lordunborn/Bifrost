@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -134,9 +134,17 @@
         <!-- Bottom Controls -->
         <Grid Grid.Row="2" Background="#80090909">
             <Grid ColumnDefinitions="180 * 180 80 180" RowDefinitions="* *" Margin="10" ColumnSpacing="10" x:Name="BottomControlsGrid">
-                <TextBlock Grid.ColumnSpan="4" VerticalAlignment="Center" x:Name="VersionTextBlock">Game Version: Unknown</TextBlock>
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="12" x:Name="VersionTextBlock">Game Version: Unknown</TextBlock>
+
+                <!-- Update status -->
+                <StackPanel Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="0" VerticalAlignment="Center" Spacing="3">
+                    <TextBlock x:Name="UpdateStatusTextBlock" FontSize="12" TextWrapping="Wrap" TextAlignment="Right" />
+                    <ProgressBar x:Name="UpdateProgressBar" Minimum="0" Maximum="100" Height="6" IsVisible="False" />
+                </StackPanel>
 
                 <Button Grid.Column="0" Grid.Row="1" x:Name="OptionsButton" Click="OptionsButton_Click">Options</Button>
+
+                <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" x:Name="UpdatesButton" Click="UpdatesButton_Click">Updates</Button>
 
                 <ComboBox Grid.Column="2" Grid.Row="1" SelectedIndex="0" x:Name="ServerComboBox" SelectionChanged="ServerComboBox_SelectionChanged">
                     <ComboBoxItem Content="Local Server" />

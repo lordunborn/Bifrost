@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bifrost.Updates\Bifrost.Updates.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.ServiceModel.Syndication" Version="10.0.3" />
   </ItemGroup>
 

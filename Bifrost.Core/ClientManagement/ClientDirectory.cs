@@ -25,6 +25,7 @@ namespace Bifrost.Core.ClientManagement
         internal string ExecutablePath64 { get => IsInitialized && Supports64 ? Path.Combine(_executableDirectory64, _executableName) : string.Empty; }
         internal bool Supports64 { get; private set; }  // Only versions 1.26.0.119 (2014-09-12) and up have Win64 executables
 
+        public string RootPath { get => _directoryPath; }
         public bool IsInitialized { get; private set; } = false;
         public ClientMetadata ClientMetadata { get; private set; } = ClientMetadata.Unknown;
         public string[] Locales { get; private set; } = Array.Empty<string>();

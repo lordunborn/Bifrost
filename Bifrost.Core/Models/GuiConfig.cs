@@ -4,6 +4,8 @@ namespace Bifrost.Core.Models
 {
     public class GuiConfig
     {
+        public string ClientPath { get; set; } = string.Empty;
+        public bool AutoCheckUpdates { get; set; } = true;
         public string ThemeOverride { get; set; } = string.Empty;
         public NewsFeedSourceCategories NewsCategoryFilter { get; set; } = NewsFeedSourceCategories.All;
         public string DefaultNewsFeedUrl { get; set; } = "https://crypto137.github.io/MHServerEmu/feed.xml";

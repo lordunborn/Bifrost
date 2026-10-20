@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Bifrost.Core.Models;
 using Bifrost.Core.News;
+using Bifrost.Core.Updates;
 using Bifrost.Core.Serialization;
 
 namespace Bifrost.Core.ClientManagement
@@ -25,9 +26,11 @@ namespace Bifrost.Core.ClientManagement
 
         public LaunchConfig LaunchConfig { get; private set; }
         public GuiConfig GuiConfig { get; private set; }
+        public DeploymentConfig Deployment { get; private set; }
 
         public ClientMetadata ClientMetadata { get => _clientDirectory.ClientMetadata; }
         public string[] Locales { get => _clientDirectory.Locales; }
+        public string ClientRoot { get => _clientDirectory.RootPath; }
 
         public ClientLauncher()
         {
@@ -42,6 +45,14 @@ namespace Bifrost.Core.ClientManagement
             // ServerList
             List<ServerInfo> serverList = JsonHelper.LoadOrCreate(ServerListFileName, JsonContext.Default.ListServerInfo);
             ServerManager.SetServerList(serverList);
+
+            // A fresh install takes the servers from the deployment file that came with the launcher.
+            Deployment = DeploymentConfig.Load();
+            if (ServerManager.ServerCount == 0)
+            {
+                foreach (ServerInfo server in Deployment.Servers)
+                    ServerManager.ServerList.Add(server);
+            }
 
             if (ServerManager.ServerCount == 0)
                 ServerManager.AddServer();
