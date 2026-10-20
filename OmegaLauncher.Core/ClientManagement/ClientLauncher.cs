@@ -136,11 +136,13 @@ namespace OmegaLauncher.Core.ClientManagement
             if (string.IsNullOrWhiteSpace(secret) || string.IsNullOrEmpty(ClientRoot))
                 return;
 
-            if (args.Any(arg => arg.StartsWith("-webtoken", StringComparison.OrdinalIgnoreCase)))
+            // The client sends -serveroverride= to the server in the free-text "dbservername" login field. (-webtoken is not usable: it makes the client
+            // log in with a token and no password.)
+            if (args.Any(arg => arg.StartsWith("-serveroverride", StringComparison.OrdinalIgnoreCase)))
                 return;
 
             int installedVersion = OmegaLauncher.Updates.Client.LauncherStateStore.Load(new OmegaLauncher.Updates.Client.MhoFolders(ClientRoot)).ContentVersion;
-            args.Add("-webtoken=" + ContentToken.Create(installedVersion, secret));
+            args.Add("-serveroverride=" + ContentToken.Create(installedVersion, secret));
         }
 
         public LaunchCommand BuildLaunchCommand()
