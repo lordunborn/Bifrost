@@ -68,6 +68,7 @@ namespace OmegaLauncher.Updates.Tests
         [InlineData("BiFrost/**", "BiFrost/Bifrost.exe", true)]
         [InlineData("Bifrost.*", "BiFrost/Bifrost.exe", true)]
         [InlineData("OmegaLauncher.*", "OmegaLauncher.GuiConfig.json", true)]
+        [InlineData("Mho.Deployment.json", "Mho.Deployment.json", true)]
         [InlineData("Data/Game/*.sip", "Data/Game/Calligraphy.sip", true)]
         [InlineData("Data/Game/*.sip", "Data/Game/Loco/x.sip", false)]
         [InlineData("**/*.dmp", "UnrealEngine3/Binaries/Win64/x.dmp", true)]

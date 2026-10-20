@@ -59,7 +59,7 @@ namespace OmegaLauncher.Updates.Publishing
             "*.bak*", "*.premerge", "*.dmp", "*.log", "*.part", "*.tmp",
             "Logs/**", "UnrealEngine3/MarvelGame/Logs/**",
             ".mho/**", ".mho-backup/**", "launcher-state.json",
-            "BiFrost/**", "Bifrost.*", "OmegaLauncher/**", "OmegaLauncher.*",
+            "BiFrost/**", "Bifrost.*", "OmegaLauncher/**", "OmegaLauncher.*", "Mho.Deployment.json",
         };
 
         public static PublishResult Publish(PublishOptions options)
