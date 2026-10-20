@@ -74,7 +74,7 @@ namespace OmegaLauncher.Core.Updates
             {
                 File.Move(newFile, currentExecutable);
 
-                if (OperatingSystem.IsWindows() == false)
+                if (!OperatingSystem.IsWindows())
                 {
                     File.SetUnixFileMode(currentExecutable,
                         UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |

@@ -35,3 +35,37 @@ The server machine never runs the game; it only stores and serves files, so noth
    from that folder against the local or real host, let it update, then start the game against the test server. Delete the folder and repeat for each release.
 3. **Existing player.** Run the launcher in a copy of your working client: it must report "up to date" without downloading anything.
 4. **Steam Deck.** Needs a real Deck (or a Linux machine with Steam and Proton). Until then the Linux build can be tested up to the update step in a Linux VM.
+
+## Releasing a new launcher
+
+Players get launcher updates the same way they get game file updates: the launcher checks `client/launcher/latest.json` (signed with the same key) when it starts and offers the new version.
+
+1. Build the release files: `.\tools\package-release.ps1 -Version 1.0.1 -DeploymentFile <your filled Mho.Deployment.json> -Out <folder outside the repo>`.
+   This produces `OmegaLauncher-1.0.1-win-x64.zip` and `OmegaLauncher-1.0.1-linux-x64.tar.gz` (what new players download, with your deployment file inside) and a `programs` folder (what existing launchers download).
+2. Publish the programs for self-update, once per platform:
+   `OmegaLauncher.Publisher publish-launcher <folder>\programs\OmegaLauncher-win-x64.exe --platform win-x64 --version 1.0.1 --key mho-private.pem --out host --notes "what is new"`
+   and the same with `OmegaLauncher-linux-x64` and `--platform linux-x64`. Platforms of the same version go into one release.
+3. Upload `host\launcher` to the server's `client\launcher` folder: the program files first, `latest.sig` and `latest.json` last.
+4. Hand the two archives to new players. Existing players are offered the update the next time they open the launcher.
+
+A launcher only updates to a version higher than its own, so every release needs a higher number than the last. The signature covers the file hashes, so a changed or substituted program is refused.
+`Mho.Deployment.json` is never published (the publisher excludes it); it travels only inside the archives you hand out.
+
+## Refusing out-of-date clients (the server gate)
+
+Optional. With the gate on, the server refuses a login ("patch required") unless the client proves it has the launcher-managed files at or above a version you choose. Players who start the game any other way are refused too, so they are sent back to the launcher.
+
+How it works: the launcher gives the game a small signed token (the installed content version, signed with a shared secret) through the launch option `-twofactorauthname=`. The game sends it to the server in the login request, which has no other use for that field. This is a guard against stale clients, not strong security: the secret ships with the launcher.
+
+1. Make a secret and keep it out of chat and git. For example in PowerShell: `-join ((48..57)+(65..90)+(97..122) | Get-Random -Count 40 | % {[char]$_})`.
+2. Put it in the launcher's `Mho.Deployment.json` as `ContentTokenSecret` (the file you hand to players).
+3. Put it in the server's `Config.ini` (or `ConfigOverride.ini`), section `[PlayerManager]`:
+
+       RequiredContentVersion=1
+       ContentTokenSecret=<the same secret>
+
+   `RequiredContentVersion` is the content version players must have (the number the launcher shows as "version"). Raise it when an update must be mandatory. `0` turns the gate off (the default).
+   If the secret is empty the server logs an error and does not enforce the gate, so a typo cannot lock everyone out.
+4. Restart the server. In the log, a refused login looks like `IsClientContentOutOfDate(): <email> sent no valid client content token (required version 1, fields: ...)` or `has client content version N, required M`.
+
+`AllowClientVersionMismatch` (the exe version check) is separate and keeps working as before.
