@@ -1,4 +1,4 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,9 +14,9 @@
 
                 <CheckBox Grid.Column="0" Grid.Row="2" x:Name="ForceCustomResolutionCheckBox" IsCheckedChanged="ForceCustomResolutionCheckBox_IsCheckedChanged" Content="Force Custom Resolution" />
                 <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
-                    <TextBox Width="48" x:Name="CustomResolutionXTextBox" MaxLength="5" />
+                    <TextBox Width="96" x:Name="CustomResolutionXTextBox" MaxLength="5" />
                     <Label VerticalAlignment="Center" Content="x" />
-                    <TextBox Width="48" x:Name="CustomResolutionYTextBox" MaxLength="5" />
+                    <TextBox Width="96" x:Name="CustomResolutionYTextBox" MaxLength="5" />
                 </StackPanel>
 
                 <CheckBox Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" x:Name="NoHomeDirectoryCheckBox" Content="Keep User Data in Installation Directory" />

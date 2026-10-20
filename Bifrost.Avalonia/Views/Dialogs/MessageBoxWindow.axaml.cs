@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.Threading.Tasks;
 
@@ -34,7 +34,7 @@ public partial class MessageBoxWindow : Window
         switch (settings.Type)
         {
             case MessageBoxType.OK:
-                Grid.SetColumnSpan(OKButton, 2);
+                Grid.SetColumnSpan(OKButton, 3);
                 CancelButton.IsVisible = false;
                 break;
 

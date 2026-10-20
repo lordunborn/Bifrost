@@ -23,25 +23,6 @@
                     <Setter Property="Foreground" Value="#E8EEF5" />
                 </Style>
 
-                <Style Selector="TextBlock.heading">
-                    <Setter Property="FontFamily" Value="{DynamicResource ResourceKey=BebasNeue}" />
-                </Style>
-
-                <Style Selector="TextBlock.caption">
-                    <Setter Property="FontSize" Value="14" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                    <Setter Property="Foreground" Value="#8FA3B8" />
-                    <Setter Property="LetterSpacing" Value="1" />
-                </Style>
-
-                <Style Selector="Border.card">
-                    <Setter Property="Background" Value="#CC0A111A" />
-                    <Setter Property="BorderBrush" Value="#33FFFFFF" />
-                    <Setter Property="BorderThickness" Value="1" />
-                    <Setter Property="CornerRadius" Value="14" />
-                    <Setter Property="Padding" Value="28" />
-                </Style>
-
                 <Style Selector="Border.ready-icon">
                     <Setter Property="Width" Value="32" />
                     <Setter Property="Height" Value="32" />
@@ -91,43 +72,6 @@
                     </Style>
                 </Style>
 
-                <Style Selector="Button">
-                    <Setter Property="Background" Value="#1B2B3F" />
-                    <Setter Property="Foreground" Value="#E8EEF5" />
-                    <Setter Property="BorderBrush" Value="#44607F" />
-                    <Setter Property="BorderThickness" Value="1" />
-                    <Setter Property="CornerRadius" Value="10" />
-                    <Setter Property="FontSize" Value="20" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                    <Setter Property="Padding" Value="24 0" />
-                    <Setter Property="Height" Value="52" />
-                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                </Style>
-
-                <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#27405D" />
-                </Style>
-
-                <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#27405D" />
-                </Style>
-
-                <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Opacity" Value="0.45" />
-                </Style>
-
-                <!-- Keyboard / D-pad focus ring, visible on every focusable control. -->
-                <Style Selector="Button:focus-visible /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="BorderBrush" Value="#FFFFFF" />
-                    <Setter Property="BorderThickness" Value="3" />
-                </Style>
-
-                <Style Selector="ComboBox:focus-visible">
-                    <Setter Property="BorderBrush" Value="#FFFFFF" />
-                    <Setter Property="BorderThickness" Value="3" />
-                </Style>
-
                 <Style Selector="Button.play-button">
                     <Setter Property="Background" Value="#18A62E" />
                     <Setter Property="BorderBrush" Value="#5CE27A" />
@@ -146,12 +90,6 @@
                     <Setter Property="Background" Value="#1FD13C" />
                 </Style>
 
-                <Style Selector="ComboBox">
-                    <Setter Property="Height" Value="52" />
-                    <Setter Property="FontSize" Value="20" />
-                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                    <Setter Property="CornerRadius" Value="10" />
-                </Style>
             </Grid.Styles>
 
             <!-- Header -->
