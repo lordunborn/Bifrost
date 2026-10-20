@@ -56,7 +56,7 @@ namespace Bifrost.Updates.Publishing
     {
         public static readonly string[] DefaultExcludes =
         {
-            "*.bak*", "*.dmp", "*.log", "*.part", "*.tmp",
+            "*.bak*", "*.premerge", "*.dmp", "*.log", "*.part", "*.tmp",
             "Logs/**", "UnrealEngine3/MarvelGame/Logs/**",
             ".mho/**", ".mho-backup/**", "launcher-state.json",
             "BiFrost/**", "Bifrost.*",
