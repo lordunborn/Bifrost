@@ -38,7 +38,26 @@ The server machine never runs the game; it only stores and serves files, so noth
 
 ## Releasing a new launcher
 
+There are two parts: the **public release on GitHub** (built automatically) and the **launcher update on your server** (so existing players are offered it).
+
+### 1. The public GitHub release (automatic)
+
+1. Make sure everything is committed and pushed to `master`.
+2. Push a version tag. The version must be higher than the last release: `git tag v1.0.1` then `git push origin v1.0.1`.
+3. The **Release** workflow (Actions tab) then runs the privacy check and the tests, builds Windows and Linux, and publishes a GitHub release with:
+   `OmegaLauncher-1.0.1-win-x64.zip`, `OmegaLauncher-1.0.1-linux-x64.tar.gz`, the raw `programs` (for step 2 below) and `SHA256SUMS.txt`.
+4. It stops without publishing if the repository holds a server address, saved login or key, or if an archive contains `Mho.Deployment.json`.
+5. To try the build without publishing anything: Actions tab, **Release**, **Run workflow**, enter a version. The files stay as a downloadable workflow artifact for 14 days.
+
+The public release holds the **plain launcher only**. `Mho.Deployment.json` (your server address, signing key and token secret) is never in it: players download the launcher from GitHub and get that one file from you.
+To fix a bad release, delete the release and its tag on GitHub, fix the problem, and tag again with a new, higher version number.
+
+### 2. The launcher update on your server (so existing players are offered it)
+
 Players get launcher updates the same way they get game file updates: the launcher checks `client/launcher/latest.json` (signed with the same key) when it starts and offers the new version.
+Download the `programs` files from the GitHub release (or build them yourself with the script below) and publish them with the commands in the next section.
+
+### Building the files by hand (and player-ready archives with your deployment file inside)
 
 1. Build the release files: `.\tools\package-release.ps1 -Version 1.0.1 -DeploymentFile <your filled Mho.Deployment.json> -Out <folder outside the repo>`.
    This produces `OmegaLauncher-1.0.1-win-x64.zip` and `OmegaLauncher-1.0.1-linux-x64.tar.gz` (what new players download, with your deployment file inside) and a `programs` folder (what existing launchers download).

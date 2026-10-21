@@ -19,9 +19,9 @@ client launching, server list and news feed come from Bifrost. See `LICENSE` for
 
 1. Get the stock 1.53.0.203 Marvel Heroes client (for example from Steam).
 
-2. Download the Omega Launcher release from your server's page and extract it anywhere. The launcher finds the game in your Steam libraries, or asks for the folder.
+2. Download the newest Omega Launcher from this repository's **Releases** page and extract it anywhere. Put the `Mho.Deployment.json` file you got from the server owner next to the launcher (it holds the server address, so it is not part of the public download). The launcher finds the game in your Steam libraries, or asks for the folder.
 
-3. Run `OmegaLauncher.exe` (Windows) or `OmegaLauncher` (Linux), press **Update** when asked, then **Play**.
+3. Run `OmegaLauncher.exe` (Windows) or `start-omega-launcher.sh` (Linux), press **Update** when asked, then **Play**.
 
 **NOTE: Omega Launcher is an unsigned executable that starts another process. This may cause false positive detections from various antivirus and antimalware software. If this causes inconvenience, please feel free to build the source code yourself.**
 

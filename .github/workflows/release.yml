@@ -1,0 +1,104 @@
+name: Release
+
+# Publishing a release: push a version tag, for example   git tag v1.0.1 && git push origin v1.0.1
+# Testing the build without publishing anything: Actions tab -> Release -> Run workflow (enter a version). The files are kept as a workflow artifact.
+#
+# The release holds the PLAIN launcher only (no Mho.Deployment.json): that file carries the server address and the token secret and must never be public.
+# Players get it from the server owner. See docs/PUBLISHING.md.
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build, for example 1.0.1 (builds the files only; nothing is published)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Work out the version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="${{ inputs.version }}"
+          fi
+          if ! echo "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Version must look like 1.0.1 (got '$version')"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Building Omega Launcher $version"
+
+      - name: Privacy check (no server address, saved login or key in the repository)
+        run: sh tools/check-repo-privacy.sh
+
+      - name: Run the tests
+        run: dotnet test OmegaLauncher.Updates.Tests --nologo -v q
+
+      - name: Build the release files
+        shell: pwsh
+        run: ./tools/package-release.ps1 -Version "${{ steps.version.outputs.version }}" -Out ./release
+
+      - name: Check the files, and write checksums
+        shell: bash
+        run: |
+          cd release
+          ls -la . programs
+          # Neither archive may contain the deployment file.
+          # (grep reads the whole listing: with "grep -q" and pipefail an early exit could hide a real match.)
+          unzip -l OmegaLauncher-*-win-x64.zip > zip-listing.txt
+          tar -tzf OmegaLauncher-*-linux-x64.tar.gz > tar-listing.txt
+          if grep -c "Mho.Deployment.json" zip-listing.txt tar-listing.txt | grep -v ":0$"; then echo "An archive contains Mho.Deployment.json"; exit 1; fi
+          # The Linux program and start script must keep their executable bit.
+          tar -tvzf OmegaLauncher-*-linux-x64.tar.gz | grep -E '^-rwxr-xr-x.*(OmegaLauncher/OmegaLauncher|start-omega-launcher.sh)$' | wc -l | grep -q '^2$'
+          sha256sum *.zip *.tar.gz programs/* > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Keep the files as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: omega-launcher-${{ steps.version.outputs.version }}
+          path: release/
+          retention-days: 14
+
+      - name: Publish the GitHub release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          cat > notes-header.md <<'EOF'
+          **To play you need two things:** this launcher, and the `Mho.Deployment.json` file from your server owner (it holds the server address).
+          Put `Mho.Deployment.json` in the same folder as the launcher. Without it the launcher starts but has no server and no updater.
+
+          - **Windows:** download the `.zip`, extract it anywhere, run `OmegaLauncher.exe`.
+          - **Linux / Steam Deck:** download the `.tar.gz`, extract it, run `start-omega-launcher.sh`.
+          - The `programs` files are what the server owner publishes for self-update; players do not need them.
+          - `SHA256SUMS.txt` lists the checksum of every file.
+
+          The launcher is not code-signed, so antivirus software may warn about it. Full guide: `docs/PLAYERS.md`.
+
+          ---
+          EOF
+          gh release create "v$version" release/*.zip release/*.tar.gz release/programs/* release/SHA256SUMS.txt \
+            --title "Omega Launcher $version" \
+            --notes-file notes-header.md \
+            --generate-notes

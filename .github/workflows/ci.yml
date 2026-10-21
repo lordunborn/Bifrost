@@ -1,0 +1,23 @@
+name: CI
+
+# Every push to master and every pull request: the privacy check and the tests (Linux; the Windows-only tests skip themselves).
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Privacy check
+        run: sh tools/check-repo-privacy.sh
+      - name: Tests
+        run: dotnet test OmegaLauncher.Updates.Tests --nologo -v q

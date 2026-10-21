@@ -23,7 +23,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$project = Join-Path $root 'OmegaLauncher.Avalonia\OmegaLauncher.Avalonia.csproj'
+$project = Join-Path $root 'OmegaLauncher.Avalonia/OmegaLauncher.Avalonia.csproj'   # forward slashes: also works on a Linux build machine
 
 if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must look like 1.0.1 (got '$Version')." }
 if ($DeploymentFile -ne '' -and -not (Test-Path $DeploymentFile)) { throw "Deployment file not found: $DeploymentFile" }

@@ -8,9 +8,15 @@ Omega Launcher starts Marvel Heroes Omega, keeps your game files in step with th
 - About 4 GB of free disk space for the update and the backups of the original files it replaces.
 - Windows 10 or 11, or Linux with Steam (Steam Deck included).
 
+## Getting the launcher
+
+Download it from the **Releases** page of this project on GitHub (the newest release; the **Windows** `.zip` or the **Linux / Steam Deck** `.tar.gz`).
+You also need one small file from the server owner, **`Mho.Deployment.json`**. It holds the server address. Save it in the same folder as the launcher after you extract it.
+(Without that file the launcher still starts, but it has no server to connect to and cannot update your game files.)
+
 ## Windows
 
-1. Extract the zip anywhere (a folder on your desktop is fine). Do not put it inside the game folder.
+1. Extract the zip anywhere (a folder on your desktop is fine). Do not put it inside the game folder. Put `Mho.Deployment.json` next to `OmegaLauncher.exe`.
 2. Run `OmegaLauncher.exe`. Windows or your antivirus may warn about an unsigned program. That is expected for a small community program; the warning is about the file being unknown, not about anything it does.
 3. The launcher looks for the game in your Steam libraries. If it cannot find it, it asks you to pick the game folder (the one that contains `UnrealEngine3` and `Data`).
 4. If the status says **Update required**, press the green button (it says **Update**). The launcher shows how much it will download, makes a backup of every original file it replaces, and updates only what is different.
