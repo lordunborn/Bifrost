@@ -1,6 +1,7 @@
 name: CI
 
-# Every push to master and every pull request: the privacy check and the tests (Linux; the Windows-only tests skip themselves).
+# Every push to master and every pull request: the privacy check, the tests (Linux; the Windows-only tests skip themselves), and a full
+# build of the Windows and Linux release files, so a broken release build shows up here and not on release day. Nothing is published.
 on:
   push:
     branches: [master]
@@ -21,3 +22,8 @@ jobs:
         run: sh tools/check-repo-privacy.sh
       - name: Tests
         run: dotnet test OmegaLauncher.Updates.Tests --nologo -v q
+      - name: Build the release files (the same script the Release workflow uses)
+        shell: pwsh
+        run: ./tools/package-release.ps1 -Version 0.0.1 -Out ./release
+      - name: Check the release files
+        run: sh tools/check-release-files.sh release

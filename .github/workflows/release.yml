@@ -59,15 +59,9 @@ jobs:
       - name: Check the files, and write checksums
         shell: bash
         run: |
+          sh tools/check-release-files.sh release
           cd release
           ls -la . programs
-          # Neither archive may contain the deployment file.
-          # (grep reads the whole listing: with "grep -q" and pipefail an early exit could hide a real match.)
-          unzip -l OmegaLauncher-*-win-x64.zip > zip-listing.txt
-          tar -tzf OmegaLauncher-*-linux-x64.tar.gz > tar-listing.txt
-          if grep -c "Mho.Deployment.json" zip-listing.txt tar-listing.txt | grep -v ":0$"; then echo "An archive contains Mho.Deployment.json"; exit 1; fi
-          # The Linux program and start script must keep their executable bit.
-          tar -tvzf OmegaLauncher-*-linux-x64.tar.gz | grep -E '^-rwxr-xr-x.*(OmegaLauncher/OmegaLauncher|start-omega-launcher.sh)$' | wc -l | grep -q '^2$'
           sha256sum *.zip *.tar.gz programs/* > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
